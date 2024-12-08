@@ -1,79 +1,86 @@
 <?php
-// Include database configuration
-include('../config/db_config.php');
-
-// Start session to manage user login state
+// Start the session (optional, if you plan to use sessions)
 session_start();
 
-// Check if the form is submitted
+// Include the database configuration file
+require_once '../config/db_config.php';
+
+// Function to sanitize user input
+function sanitize_input($data) {
+    return htmlspecialchars(stripslashes(trim($data)));
+}
+
+// Check if the form is submitted via POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve and sanitize form inputs
+    $email = sanitize_input($_POST['email']);
+    $name = sanitize_input($_POST['name']);
+    $password = $_POST['password']; // Password will be hashed, so no need to sanitize here
+    $telephone = sanitize_input($_POST['telephone']);
+    $user_type = sanitize_input($_POST['user_type']);
 
-    // Get the form data
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+    // Basic validation (you can add more as needed)
+    if (empty($email) || empty($name) || empty($password) || empty($telephone) || empty($user_type)) {
+        die("Please fill in all required fields.");
+    }
 
-    // Check if the email and password fields are not empty
-    if (!empty($email) && !empty($password)) {
+    // Validate email format
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        die("Invalid email format.");
+    }
 
-        // Sanitize input to prevent SQL injection
-        $email = mysqli_real_escape_string($conn, $email);
-        $password = mysqli_real_escape_string($conn, $password);
+    // Validate user_type
+    $allowed_user_types = ['Company', 'Passenger'];
+    if (!in_array($user_type, $allowed_user_types)) {
+        die("Invalid user type selected.");
+    }
 
-        // SQL query to fetch user details from database
-        $sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
-        $result = mysqli_query($conn, $sql);
+    // Hash the password securely
+    $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        // Check if the user exists in the database
-        if (mysqli_num_rows($result) == 1) {
-            // Fetch user data
-            $user = mysqli_fetch_assoc($result);
+    // Check if the email already exists
+    $check_email_query = "SELECT email FROM users WHERE email = ?";
+    if ($stmt = $conn->prepare($check_email_query)) {
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
 
-            // Store user details in session variables
-            $_SESSION['user_id'] = $user['user_id'];
-            $_SESSION['name'] = $user['name'];
-            $_SESSION['email'] = $user['email'];
+        if ($stmt->num_rows > 0) {
+            // Email already exists
+            $stmt->close();
+            die("This email is already registered. Please use a different email or login.");
+        }
+        $stmt->close();
+    } else {
+        // SQL statement preparation failed
+        die("Database error: Unable to prepare statement.");
+    }
 
-            // Redirect to the dashboard or homepage after successful login
-            header("Location: ../dashboard.php");  // Change this to your desired page
+    // Insert the new user into the database
+    $insert_query = "INSERT INTO users (name, email, password, telephone, user_type, account_balance) VALUES (?, ?, ?, ?, ?, 0.00)";
+    
+    if ($stmt = $conn->prepare($insert_query)) {
+        $stmt->bind_param("sssss", $name, $email, $hashed_password, $telephone, $user_type);
+        
+        if ($stmt->execute()) {
+            // Registration successful, redirect to login.html
+            $stmt->close();
+            $conn->close();
+            header("Location: ../../html/Login.html");
             exit();
         } else {
-            // If login fails, display an error message
-            $error_message = "Invalid email or password.";
+            // Insertion failed
+            $stmt->close();
+            $conn->close();
+            die("Registration failed. Please try again.");
         }
-
     } else {
-        // Display error if fields are empty
-        $error_message = "Please fill in both fields.";
+        // SQL statement preparation failed
+        die("Database error: Unable to prepare statement.");
     }
+} else {
+    // If the form was not submitted via POST, redirect to registration page
+    header("Location: ../../html/Registration.html");
+    exit();
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="../css/Login.css">
-</head>
-<body>
-    <div class="login-container">
-        <h2>Login</h2>
-        
-        <!-- Display error message if login fails -->
-        <?php if (isset($error_message)) { echo "<p style='color:red;'>$error_message</p>"; } ?>
-
-        <form action="login.php" method="POST">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-
-            <button type="submit">Login</button>
-        </form>
-
-        <p>Don't have an account? <a href="registration.php">Register</a></p>
-    </div>
-</body>
-</html>

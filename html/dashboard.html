@@ -2,12 +2,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dashboard</title>
-
-    <link rel="stylesheet" href="../css/Login.css">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../css/Registration.css"> <!-- Reusing Registration.css for styling -->
+    <style>
+        /* Additional styling can be added here */
+        .container {
+            width: 80%;
+            margin: auto;
+            padding-top: 50px;
+            text-align: center;
+        }
+        a.button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        a.button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>dashbord </h1>
+    <div class="container">
+        <h1>Welcome to Your Dashboard</h1>
+        <!-- Add more dashboard content here -->
+
+        <!-- Link to Profile Page -->
+        <a href="../php/controllers/profile.php" class="button">View/Edit Profile</a>
+
+        <!-- Link to Logout (optional) -->
+        <a href="../php/controllers/logout.php" class="button">Logout</a>
+    </div>
 </body>
 </html>
