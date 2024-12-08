@@ -1,35 +1,35 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="G:\year 4 semester 1\Web Engineering\Project\css\Registration.css">
-        <body>
-            <form>
-                <text>
-                    Create an account
-                </text>
-                <br>
-                <label>Email:</label>
-                <input type="email" id="email" required>
-                <br>
-                <label>Name:</label>
-                <input type="text" id="name" required>
-                <br>
-                <label>Password:
-                </label>
-                <input type="password" id="password" required>
-                <br>
-                <label>Telephone:</label>
-                <input type="tel" id="telephone" required>
-                <br>
-                <label>Type:</label>
-                <select required>
-                    <option id="company">Company</option>
-                    <option id="passenger">Passenger</option>
-                </select>
-                <input type="submit" value="submit">
-                <br>
-                <text style="font-size:15px ; text-align: center;">already have an account? <a href="Login.html">login</a></text>
-                
-            </form>
-        </body>
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <link rel="stylesheet" href="../css/Registration.css">
+</head>
+<body>
+    <!-- Form that submits to register.php -->
+    <form action="../php/controllers/register.php" method="POST">
+        <h2>Create an account</h2>
+
+        <label>Email:</label>
+        <input type="email" name="email" id="email" required><br>
+
+        <label>Name:</label>
+        <input type="text" name="name" id="name" required><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" id="password" required><br>
+
+        <label>Telephone:</label>
+        <input type="tel" name="telephone" id="telephone" required><br>
+
+        <label>User Type:</label>
+        <select name="user_type" id="user_type" required>
+            <option value="Company">Company</option>
+            <option value="Passenger">Passenger</option>
+        </select><br>
+
+        <input type="submit" value="Register">
+    </form>
+</body>
 </html>
