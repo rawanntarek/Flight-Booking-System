@@ -1,0 +1,26 @@
+.container {
+    width: 60%;
+    margin: auto;
+    padding-top: 30px;
+}
+.errors {
+    color: red;
+}
+.flight-details {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+.flight-details h2 {
+    margin-top: 0;
+}
+.flight-details p {
+    margin: 10px 0;
+}
+.back-link {
+    margin-top: 20px;
+    display: inline-block;
+    text-decoration: none;
+    color: #2196F3;
+}

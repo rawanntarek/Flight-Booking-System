@@ -24,6 +24,33 @@
         a.button:hover {
             background-color: #45a049;
         }
+        .search-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: inline-block;
+            text-align: left;
+        }
+        .search-section label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .search-section input, .search-section select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        .search-section input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .search-section input[type="submit"]:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -34,8 +61,22 @@
         <!-- Link to Profile Page -->
         <a href="../php/controllers/profile.php" class="button">View/Edit Profile</a>
 
-        <!-- Link to Logout (optional) -->
+        <!-- Link to Logout -->
         <a href="../php/controllers/logout.php" class="button">Logout</a>
+
+        <!-- Search a Flight Section -->
+        <div class="search-section">
+            <h2>Search a Flight</h2>
+            <form method="GET" action="../php/controllers/search_flight.php">
+                <label for="from">From:</label>
+                <input type="text" id="from" name="from" placeholder="Enter departure location" required>
+
+                <label for="to">To:</label>
+                <input type="text" id="to" name="to" placeholder="Enter destination location" required>
+
+                <input type="submit" value="Search">
+            </form>
+        </div>
     </div>
 </body>
 </html>
