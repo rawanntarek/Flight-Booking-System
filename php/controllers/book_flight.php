@@ -235,7 +235,7 @@ $conn->close();
         <?php endif; ?>
 
         <!-- Back to Flight Info Link -->
-        <a href="flight_info.php?flight_id=<?php echo urlencode($flight_id); ?>" class="button">Back to Flight Info</a>
+        <a href="../../html/dashboard.html" class="button">Back to Flight Info</a>
     </div>
 </body>
 </html>

@@ -33,8 +33,8 @@ $bookingSql = "
     SELECT 
         f.flight_id, 
         f.name, 
-        JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.from')) AS `from_location`, 
-        JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.to')) AS `to_location`, 
+        JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.from')) AS from_location, 
+        JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.to')) AS to_location, 
         f.fees, 
         f.start_time, 
         f.end_time, 
@@ -49,13 +49,15 @@ $bookingSql = "
 
 if ($stmt = $conn->prepare($bookingSql)) {
     $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
 
-    while ($row = $result->fetch_assoc()) {
-        $bookings[] = $row;
+        while ($row = $result->fetch_assoc()) {
+            $bookings[] = $row;
+        }
+    } else {
+        $errors[] = "Database error: Execution failed. " . $stmt->error;
     }
-
     $stmt->close();
 } else {
     // Capture and display the specific error

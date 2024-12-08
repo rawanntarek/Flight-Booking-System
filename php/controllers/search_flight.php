@@ -28,33 +28,54 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Retrieve the user ID from the session
+$user_id = $_SESSION['user_id'];
+
 // Check if the form is submitted via GET
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     // Retrieve and sanitize form inputs
     $from = sanitize_input($_GET['from'] ?? '');
     $to = sanitize_input($_GET['to'] ?? '');
 
-    // No required fields, so no validation needed here
-
     // Build dynamic SQL query based on inputs
+    // This query selects flights that are not completed,
+    // not already booked by the user,
+    // and have available seats.
     $searchSql = "
-        SELECT flight_id, name, fees, start_time, end_time
-        FROM flights
-        WHERE completed = 0
+        SELECT 
+            f.flight_id, 
+            f.name, 
+            f.fees, 
+            f.start_time, 
+            f.end_time,
+            f.capacity,
+            (f.capacity - COUNT(fp.user_id)) AS remaining_seats
+        FROM 
+            flights f
+        LEFT JOIN 
+            flight_passengers fp ON f.flight_id = fp.flight_id AND fp.status = 'Registered'
+        WHERE 
+            f.completed = 0
+            AND f.flight_id NOT IN (
+                SELECT flight_id 
+                FROM flight_passengers 
+                WHERE user_id = ?
+                  AND status = 'Registered'
+            )
     ";
 
     $conditions = [];
-    $params = [];
-    $types = "";
+    $params = [$user_id]; // Initialize with user_id for the subquery
+    $types = "i"; // Assuming user_id is an integer
 
     if (!empty($from)) {
-        $conditions[] = "JSON_UNQUOTE(JSON_EXTRACT(itinerary, '$.from')) LIKE ?";
+        $conditions[] = "JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.from')) LIKE ?";
         $params[] = "%" . $from . "%";
         $types .= "s";
     }
 
     if (!empty($to)) {
-        $conditions[] = "JSON_UNQUOTE(JSON_EXTRACT(itinerary, '$.to')) LIKE ?";
+        $conditions[] = "JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.to')) LIKE ?";
         $params[] = "%" . $to . "%";
         $types .= "s";
     }
@@ -63,10 +84,19 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         $searchSql .= " AND " . implode(" AND ", $conditions);
     }
 
-    $searchSql .= " ORDER BY start_time ASC";
+    $searchSql .= "
+        GROUP BY 
+            f.flight_id
+        HAVING 
+            remaining_seats > 0
+        ORDER BY 
+            f.start_time ASC
+    ";
 
     if ($stmt = $conn->prepare($searchSql)) {
-        if (!empty($conditions)) {
+        // Bind parameters
+        if (!empty($params)) {
+            // Use the splat operator to unpack the $params array
             $stmt->bind_param($types, ...$params);
         }
         if ($stmt->execute()) {
@@ -172,6 +202,7 @@ $conn->close();
                         <th>Fees ($)</th>
                         <th>Start Time</th>
                         <th>End Time</th>
+                        <th>Remaining Seats</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -183,6 +214,7 @@ $conn->close();
                             <td><?php echo htmlspecialchars(number_format($flight['fees'], 2)); ?></td>
                             <td><?php echo htmlspecialchars($flight['start_time']); ?></td>
                             <td><?php echo htmlspecialchars($flight['end_time']); ?></td>
+                            <td><?php echo htmlspecialchars($flight['remaining_seats']); ?></td>
                             <td>
                                 <a class="button" href="flight_info.php?flight_id=<?php echo urlencode($flight['flight_id']); ?>">View Details</a>
                             </td>
