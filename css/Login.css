@@ -1,0 +1,100 @@
+body {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(-45deg, #3086ae, #cfe6ff, #23a6d5, #000336);    
+    background-size: cover;
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh;
+    position: relative;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.image-container {
+    position: absolute;
+    top: 0;
+    left: 25%;
+    transform: translateX(50%);
+    transform: translateY(22%);
+    z-index: -1;
+    width: 60%; /* Adjust width to make the image smaller */
+    max-width: 400px; /* Limit the maximum width */
+    height: 400px;
+    border-radius: 10px; /* Optional: Add rounded corners to the shadow box */
+    padding: 10px; /* Optional: Add padding inside the box */
+}
+
+.image-container img {
+    width: 700px; /* Ensure the image scales with the container */
+    height: 500px; /* Maintain aspect ratio */
+    border-radius: 10px; /* Optional: Add rounded corners to the image */
+}
+
+form {
+    background: #ffffff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    position: relative;
+    z-index: 1;
+    margin-right: 600px;
+    height: 330px;
+}
+
+text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #052b53;
+    margin-bottom: 20px;
+    display: block;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    color: #052b53;
+    font-weight: 900;
+    font-size: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #777777;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+input[type="submit"] {
+    background-color: #052b53;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #cedae7;
+}
