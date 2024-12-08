@@ -21,6 +21,7 @@ function sanitize_input($data) {
 $flight_id = 0;
 $flight = null;
 $errors = [];
+$success = "";
 
 // Check if 'flight_id' is provided via GET
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['flight_id'])) {
@@ -65,7 +66,63 @@ if ($flight && isset($flight['itinerary'])) {
     <meta charset="UTF-8">
     <title>Flight Information</title>
     <link rel="stylesheet" href="../../css/Registration.css"> <!-- Reusing Registration.css for styling -->
-    <link rel="stylesheet" href="../../css/flight_info.css"> <!-- Reusing Registration.css for styling -->
+    <style>
+        .container {
+            width: 60%;
+            margin: auto;
+            padding-top: 30px;
+        }
+        .errors {
+            color: red;
+        }
+        .flight-details {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .flight-details h2 {
+            margin-top: 0;
+        }
+        .flight-details p {
+            margin: 10px 0;
+        }
+        .back-link {
+            margin-top: 20px;
+            display: inline-block;
+            text-decoration: none;
+            color: #2196F3;
+        }
+        .book-section {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #e9f5ff;
+        }
+        .book-section h3 {
+            margin-top: 0;
+        }
+        .book-section label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .book-section select, .book-section input[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        .book-section input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .book-section input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -82,6 +139,13 @@ if ($flight && isset($flight['itinerary'])) {
             </div>
         <?php endif; ?>
 
+        <!-- Display success message -->
+        <?php if (!empty($success)): ?>
+            <div class="success">
+                <p><?php echo htmlspecialchars($success); ?></p>
+            </div>
+        <?php endif; ?>
+
         <!-- Display flight details if available -->
         <?php if ($flight): ?>
             <div class="flight-details">
@@ -93,6 +157,30 @@ if ($flight && isset($flight['itinerary'])) {
                 <p><strong>Start Time:</strong> <?php echo htmlspecialchars($flight['start_time']); ?></p>
                 <p><strong>End Time:</strong> <?php echo htmlspecialchars($flight['end_time']); ?></p>
                 <p><strong>Status:</strong> <?php echo ($flight['completed']) ? 'Completed' : 'Upcoming'; ?></p>
+            </div>
+
+            <!-- Booking Section -->
+            <div class="book-section">
+                <h3>Book This Flight</h3>
+                <form method="POST" action="../controllers/book_flight.php">
+                    <input type="hidden" name="flight_id" value="<?php echo htmlspecialchars($flight['flight_id']); ?>">
+
+                    <?php if ($_SESSION['user_type'] === 'Passenger'): ?>
+                        <label for="payment_method">Payment Method:</label>
+                        <select name="payment_method" id="payment_method" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="balance">Pay from Account Balance</option>
+                            <option value="cash">Pay Cash</option>
+                        </select>
+                    <?php endif; ?>
+
+                    <?php if ($_SESSION['user_type'] === 'Passenger'): ?>
+                        <!-- For Passengers, payment method is always from balance -->
+                        <!-- <input type="hidden" name="payment_method" value="balance"> -->
+                    <?php endif; ?>
+
+                    <input type="submit" value="Book Flight">
+                </form>
             </div>
         <?php endif; ?>
 

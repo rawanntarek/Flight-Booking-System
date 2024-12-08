@@ -22,34 +22,54 @@ $from = $to = "";
 $flights = [];
 $errors = [];
 
+// Enable detailed error reporting (for development only)
+// Comment out or remove these lines in production
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Check if the form is submitted via GET
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     // Retrieve and sanitize form inputs
     $from = sanitize_input($_GET['from'] ?? '');
     $to = sanitize_input($_GET['to'] ?? '');
 
-    // Basic validation
-    if (empty($from) || empty($to)) {
-        $errors[] = "Both 'From' and 'To' fields are required.";
+    // No required fields, so no validation needed here
+
+    // Build dynamic SQL query based on inputs
+    $searchSql = "
+        SELECT flight_id, name, fees, start_time, end_time
+        FROM flights
+        WHERE completed = 0
+    ";
+
+    $conditions = [];
+    $params = [];
+    $types = "";
+
+    if (!empty($from)) {
+        $conditions[] = "JSON_UNQUOTE(JSON_EXTRACT(itinerary, '$.from')) LIKE ?";
+        $params[] = "%" . $from . "%";
+        $types .= "s";
     }
 
-    if (empty($errors)) {
-        // Prepare SQL statement to search for flights
-        // Using JSON_EXTRACT to parse the 'itinerary' JSON field
-        $searchSql = "
-            SELECT flight_id, name, fees, start_time, end_time
-            FROM flights
-            WHERE JSON_UNQUOTE(JSON_EXTRACT(itinerary, '$.from')) LIKE ?
-              AND JSON_UNQUOTE(JSON_EXTRACT(itinerary, '$.to')) LIKE ?
-              AND completed = 0
-        ";
+    if (!empty($to)) {
+        $conditions[] = "JSON_UNQUOTE(JSON_EXTRACT(itinerary, '$.to')) LIKE ?";
+        $params[] = "%" . $to . "%";
+        $types .= "s";
+    }
 
-        if ($stmt = $conn->prepare($searchSql)) {
-            // Use wildcards for partial matching
-            $from_param = "%" . $from . "%";
-            $to_param = "%" . $to . "%";
-            $stmt->bind_param("ss", $from_param, $to_param);
-            $stmt->execute();
+    if (!empty($conditions)) {
+        $searchSql .= " AND " . implode(" AND ", $conditions);
+    }
+
+    $searchSql .= " ORDER BY start_time ASC";
+
+    if ($stmt = $conn->prepare($searchSql)) {
+        if (!empty($conditions)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        if ($stmt->execute()) {
             $result = $stmt->get_result();
 
             // Fetch all matching flights
@@ -60,14 +80,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             } else {
                 $errors[] = "No flights found matching your criteria.";
             }
-
-            $stmt->close();
         } else {
-            $errors[] = "Database error: Unable to prepare statement.";
+            $errors[] = "Database error: Execution failed. " . $stmt->error;
         }
+
+        $stmt->close();
+    } else {
+        $errors[] = "Database error: Unable to prepare statement. " . $conn->error;
     }
-} else {
-    $errors[] = "Invalid request method.";
 }
 
 // Close the database connection
@@ -88,6 +108,9 @@ $conn->close();
         }
         .errors {
             color: red;
+        }
+        .success {
+            color: green;
         }
         table {
             width: 100%;
@@ -157,7 +180,7 @@ $conn->close();
                         <tr>
                             <td><?php echo htmlspecialchars($flight['flight_id']); ?></td>
                             <td><?php echo htmlspecialchars($flight['name']); ?></td>
-                            <td><?php echo htmlspecialchars($flight['fees']); ?></td>
+                            <td><?php echo htmlspecialchars(number_format($flight['fees'], 2)); ?></td>
                             <td><?php echo htmlspecialchars($flight['start_time']); ?></td>
                             <td><?php echo htmlspecialchars($flight['end_time']); ?></td>
                             <td>
