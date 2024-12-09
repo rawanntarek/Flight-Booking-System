@@ -7,19 +7,51 @@
     <link rel="stylesheet" href="../css/Login.css">
 </head>
 <body>
+    <div class="login-container">
     <div class="image-container">
         <img src="https://i.postimg.cc/xTM7RSCs/train.png" alt="Train Image">
     </div>
+    <div class="alert">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times; <div id="error-message" class="error-message"></div></span>
+      </div>
+
     <form method="POST" action="../php/controllers/login.php">
+        
         <h2>Login</h2>
 
         <label for="email">Email:</label>
-        <input type="email" name="email" id="email" required><br>
+        <input type="email" name="email" id="email" placeholder="Enter your email" required><br>
 
         <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required><br>
+        <input type="password" name="password" id="password" placeholder="Enter your password" required><br>
 
         <input type="submit" value="Submit">
+        <a href="Registration.html">Register here</a>
+
     </form>
+</div>
+
+<script>
+    // Function to fetch and display login errors
+    function fetchLoginError() {
+        fetch('../php/controllers/get_login_error.php', {
+            credentials: 'include' // Include cookies for session
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                const errorDiv = document.getElementById('error-message');
+                errorDiv.textContent = data.error;
+                errorDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching login error:', error);
+        });
+    }
+
+    // Fetch login errors when the page loads
+    window.onload = fetchLoginError;
+</script>
 </body>
 </html>
