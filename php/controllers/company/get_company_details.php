@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'Company') {
 }
 
 // Include the database configuration file
-require_once '../config/db_config.php';
+require_once '../../config/db_config.php';
 
 // Prepare SQL statement to fetch company details
 $query = "SELECT name, email, account_balance FROM users WHERE user_id = ?";

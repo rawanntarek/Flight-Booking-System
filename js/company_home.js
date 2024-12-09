@@ -20,7 +20,7 @@ function showError(message) {
 
 // Fetch and display company name
 function fetchCompanyName() {
-    fetch('../php/controllers/get_company_details.php', {
+    fetch('../php/controllers/company/get_company_details.php', {
         credentials: 'include'
     })
     .then(response => response.json())
