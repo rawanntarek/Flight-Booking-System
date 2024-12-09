@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'Company') {
 }
 
 // Include the database configuration file
-require_once '../config/db_config.php';
+require_once '../../config/db_config.php';
 
 // Function to sanitize user input
 function sanitize_input($data) {
@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo json_encode($response);
         } else {
             $_SESSION['update_profile_error'] = $error;
-            header("Location: ../../html/company_profile.html");
+            header("Location: ../../../html/company_profile.html");
         }
         exit();
     }
@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo json_encode($response);
             } else {
                 $_SESSION['update_profile_error'] = $error;
-                header("Location: ../../html/company_profile.html");
+                header("Location: ../../../html/company_profile.html");
             }
             exit();
         }
@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo json_encode($response);
             } else {
                 $_SESSION['update_profile_error'] = $error;
-                header("Location: ../../html/company_profile.html");
+                header("Location: ../../../html/company_profile.html");
             }
             exit();
         }
@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo json_encode($response);
             } else {
                 $_SESSION['update_profile_error'] = $error;
-                header("Location: ../../html/company_profile.html");
+                header("Location: ../../../html/company_profile.html");
             }
             exit();
         }
@@ -111,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo json_encode($response);
         } else {
             $_SESSION['update_profile_error'] = $error;
-            header("Location: ../../html/company_profile.html");
+            header("Location: ../../../html/company_profile.html");
         }
         exit();
     }
@@ -140,7 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo json_encode(['success' => $success]);
             } else {
                 $_SESSION['update_profile_success'] = $success;
-                header("Location: ../../html/company_profile.html");
+                header("Location: ../../../html/company_profile.html");
             }
             exit();
         } else {
@@ -152,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo json_encode(['error' => $error]);
             } else {
                 $_SESSION['update_profile_error'] = $error;
-                header("Location: ../../html/company_profile.html");
+                header("Location: ../../../html/company_profile.html");
             }
             exit();
         }
@@ -164,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo json_encode(['error' => $error]);
         } else {
             $_SESSION['update_profile_error'] = $error;
-            header("Location: ../../html/company_profile.html");
+            header("Location: ../../../html/company_profile.html");
         }
         exit();
     }
@@ -176,7 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo json_encode(['error' => $error]);
     } else {
         $_SESSION['update_profile_error'] = $error;
-        header("Location: ../../html/company_profile.html");
+        header("Location: ../../../html/company_profile.html");
     }
     exit();
 }

@@ -72,7 +72,7 @@
             formData.append('name', name);
 
             // Send the updated name via AJAX
-            fetch('../php/controllers/update_company_profile.php', {
+            fetch('../php/controllers/company/update_company_profile.php', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include',
@@ -111,7 +111,7 @@
             formData.append('email', email);
 
             // Send the updated email via AJAX
-            fetch('../php/controllers/update_company_profile.php', {
+            fetch('../php/controllers/company/update_company_profile.php', {
                 method: 'POST',
                 body: formData,
                 credentials: 'include',
