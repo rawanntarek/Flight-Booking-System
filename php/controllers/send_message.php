@@ -5,7 +5,12 @@ session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../../html/login.html");
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        http_response_code(401); // Unauthorized
+        echo json_encode(['error' => 'Unauthorized access. Please log in.']);
+    } else {
+        header("Location: ../../html/login.html");
+    }
     exit();
 }
 
@@ -17,6 +22,13 @@ function sanitize_input($data) {
     return htmlspecialchars(stripslashes(trim($data)));
 }
 
+// Determine if the request is AJAX
+$isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+
+// Initialize response array
+$response = [];
+
+// Handle POST request
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve and sanitize form inputs
     $sender_id = $_SESSION['user_id'];
@@ -25,9 +37,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Basic validation
     if ($receiver_id <= 0 || empty($message_content)) {
-        // Redirect back with an error
-        $_SESSION['message_error'] = "Invalid message or company selection.";
-        header("Location: dashboard.php");
+        $error = "Invalid message or company selection.";
+        if ($isAjax) {
+            http_response_code(400); // Bad Request
+            $response['error'] = $error;
+            echo json_encode($response);
+        } else {
+            $_SESSION['message_error'] = $error;
+            header("Location: ../../html/dashboard.html");
+        }
         exit();
     }
 
@@ -38,15 +56,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $company_stmt->execute();
         $company_stmt->store_result();
         if ($company_stmt->num_rows === 0) {
-            $_SESSION['message_error'] = "Selected receiver is not a valid company.";
-            $company_stmt->close();
-            header("Location: dashboard.php");
+            $error = "Selected receiver is not a valid company.";
+            if ($isAjax) {
+                http_response_code(400); // Bad Request
+                $response['error'] = $error;
+                echo json_encode($response);
+            } else {
+                $_SESSION['message_error'] = $error;
+                $company_stmt->close();
+                header("Location: ../../html/dashboard.html");
+            }
             exit();
         }
         $company_stmt->close();
     } else {
-        $_SESSION['message_error'] = "Database error: " . $conn->error;
-        header("Location: dashboard.php");
+        $error = "Database error: " . $conn->error;
+        if ($isAjax) {
+            http_response_code(500); // Internal Server Error
+            $response['error'] = $error;
+            echo json_encode($response);
+        } else {
+            $_SESSION['message_error'] = $error;
+            header("Location: dashboard.html");
+        }
         exit();
     }
 
@@ -56,26 +88,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("iis", $sender_id, $receiver_id, $message_content);
         if ($stmt->execute()) {
             // Success
-            $_SESSION['message_success'] = "Message sent successfully!";
+            $success = "Message sent successfully!";
+            if ($isAjax) {
+                $response['success'] = $success;
+                echo json_encode($response);
+            } else {
+                $_SESSION['message_success'] = $success;
+            }
         } else {
             // Execution failed
-            $_SESSION['message_error'] = "Failed to send message: " . $stmt->error;
+            $error = "Failed to send message: " . $stmt->error;
+            if ($isAjax) {
+                http_response_code(500); // Internal Server Error
+                $response['error'] = $error;
+                echo json_encode($response);
+            } else {
+                $_SESSION['message_error'] = $error;
+            }
         }
         $stmt->close();
     } else {
         // Preparation failed
-        $_SESSION['message_error'] = "Database error: " . $conn->error;
+        $error = "Database error: " . $conn->error;
+        if ($isAjax) {
+            http_response_code(500); // Internal Server Error
+            $response['error'] = $error;
+            echo json_encode($response);
+        } else {
+            $_SESSION['message_error'] = $error;
+        }
     }
 
     // Close the database connection
     $conn->close();
 
-    // Redirect back to the dashboard
-    header("Location: dashboard.php");
+    if (!$isAjax) {
+        // Redirect back to the dashboard
+        header("Location: ../../html/dashboard.html");
+    }
+
     exit();
 } else {
     // Invalid request method
-    header("Location: dashboard.php");
+    $error = "Invalid request method.";
+    if ($isAjax) {
+        http_response_code(405); // Method Not Allowed
+        $response['error'] = $error;
+        echo json_encode($response);
+    } else {
+        $_SESSION['message_error'] = $error;
+        header("Location: ../../html/dashboard.html");
+    }
     exit();
 }
 ?>

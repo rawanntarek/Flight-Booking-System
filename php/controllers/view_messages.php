@@ -131,7 +131,7 @@ $conn->close();
             <?php endif; ?>
         </div>
 
-        <a href="dashboard.php" class="back-link">← Back to Dashboard</a>
+        <a href="../../html/dashboard.html" class="back-link">← Back to Dashboard</a>
     </div>
 </body>
 </html>

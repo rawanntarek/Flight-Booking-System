@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Reusing Registration.css for styling -->
+    <link rel="stylesheet" href="../css/Registration.css"> 
+
+    <style>
+        body {
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("https://i.postimg.cc/xTM7RSCs/train.png");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: flex-start; 
+            align-items: center; 
+            height: 100vh;
+        }
+
+        /* Existing Styles */
+        .container {
+            width: 80%;
+            margin: auto;
+            padding-top: 50px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a.button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        a.button:hover {
+            background-color: #45a049;
+        }
+        .search-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: inline-block;
+            text-align: left;
+            background-color: #f9f9f9;
+        }
+        .search-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .search-section input, .search-section select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        .search-section input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .search-section input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Feedback Messages Styles */
+        .success {
+            color: green;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .errors {
+            color: red;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Chat Popup Styles */
+        /* Button used to open the chat form - fixed at the bottom of the page */
+        .open-button {
+            background-color: #2196F3; /* Changed to match existing message-circle color */
+            color: white;
+            padding: 16px 20px;
+            border: none;
+            cursor: pointer;
+            opacity: 0.9;
+            position: fixed;
+            bottom: 23px;
+            right: 28px;
+            width: 280px;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-size: 16px;
+        }
+        form {
+            margin-left: 0px;
+        }
+        /* The popup chat - hidden by default */
+        .chat-popup {
+            display: none; /* Initially hidden */
+            position: fixed;
+            bottom: 80px; /* Positioned above the open-button */
+            right: 28px;
+            z-index: 1001;
+            border-radius: 10px;
+            max-width: 300px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: #fff;
+        }
+
+        /* Add styles to the form container */
+        .form-container {
+            max-width: 100%;
+            padding: 10px;
+            background-color: white;
+            border-radius: 10px;
+        }
+
+        /* Full-width textarea */
+        .form-container textarea {
+            width: 90%;
+            padding: 15px;
+            margin: 5px 0 22px 0;
+            border: 1px solid #ccc;
+            background: #f1f1f1;
+            resize: vertical;
+            border-radius: 4px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+
+        /* When the textarea gets focus, do something */
+        .form-container textarea:focus {
+            background-color: #ddd;
+            outline: none;
+        }
+
+        /* Set a style for the submit/send button */
+        .form-container .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom:10px;
+            opacity: 0.9;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        /* Add a red background color to the cancel button */
+        .form-container .cancel {
+            background-color: red;
+        }
+
+        /* Add some hover effects to buttons */
+        .form-container .btn:hover, .open-button:hover {
+            opacity: 1;
+            transform: scale(1.02);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .chat-popup {
+                right: 5%;
+                width: 90%;
+            }
+            .open-button {
+                width: 90%;
+                right: 5%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Display Feedback Messages -->
+        <div id="feedback"></div>
+
+        <h1>Welcome to Your Dashboard</h1>
+        <!-- Add more dashboard content here -->
+
+        <!-- Links to Profile, Bookings, and Logout -->
+        <a href="../php/controllers/profile.php" class="button">View/Edit Profile</a>
+        <a href="../php/controllers/my_bookings.php" class="button">My Bookings</a>
+        <a href="../php/controllers/logout.php" class="button">Logout</a>
+
+        <!-- Search a Flight Section -->
+        <div class="search-section">
+            <h2>Search a Flight</h2>
+            <form method="GET" action="../php/controllers/search_flight.php">
+                <label for="from">From:</label>
+                <input type="text" id="from" name="from" placeholder="Enter departure location" required>
+
+                <label for="to">To:</label>
+                <input type="text" id="to" name="to" placeholder="Enter destination location" required>
+
+                <input type="submit" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <!-- Chat Popup -->
+    <button class="open-button" onclick="openForm()">Chat</button>
+
+    <div class="chat-popup" id="myForm">
+      <form id="chatForm" class="form-container">
+        <h1>Send a Message</h1>
+
+        <label for="company"><b>Select Company</b></label>
+        <select name="company_id" id="company" required>
+            <option value="" disabled selected>Select a company</option>
+            <!-- Options will be populated via JavaScript -->
+        </select>
+
+        <label for="msg"><b>Message</b></label>
+        <textarea placeholder="Type your message.." name="message_content" id="msg" required></textarea>
+
+        <button type="submit" class="btn">Send</button>
+        <button type="button" class="btn" onclick="viewMessage()">View messages</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+      </form>
+    </div>
+
+    <!-- Include JavaScript at the end of body -->
+    <script>
+        // Function to open the chat form
+        function openForm() {
+            document.getElementById("myForm").style.display = "block";
+            fetchCompanies();
+        }
+
+        // Function to close the chat form
+        function closeForm() {
+            document.getElementById("myForm").style.display = "none";
+        }
+
+
+        function viewMessage() {
+            window.location.href = "../php/controllers/view_messages.php";
+        }
+
+        // Function to fetch companies via AJAX
+        function fetchCompanies() {
+            fetch('../php/controllers/get_companies.php', {
+                credentials: 'include' // Include cookies for session
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.companies) {
+                        const companySelect = document.getElementById('company');
+                        // Clear existing options except the first
+                        companySelect.innerHTML = '<option value="" disabled selected>Select a company</option>';
+                        data.companies.forEach(company => {
+                            const option = document.createElement('option');
+                            option.value = company.user_id;
+                            option.textContent = company.name;
+                            companySelect.appendChild(option);
+                        });
+                    } else if (data.error) {
+                        displayFeedback('errors', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching companies:', error);
+                    displayFeedback('errors', 'Error fetching companies.');
+                });
+        }
+
+        // Function to display feedback messages
+        function displayFeedback(type, message) {
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            // Optionally, remove the message after some time
+            setTimeout(() => {
+                feedbackDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Handle chat form submission via AJAX
+        document.getElementById('chatForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const company_id = document.getElementById('company').value;
+            const message_content = document.getElementById('msg').value;
+
+            // Basic validation
+            if (!company_id || !message_content.trim()) {
+                displayFeedback('errors', 'Please select a company and enter a message.');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('company_id', company_id);
+            formData.append('message_content', message_content);
+
+            // Send the message via AJAX
+            fetch('../php/controllers/send_message.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include', // Include cookies for session
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest' // To indicate AJAX request
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayFeedback('success', data.success);
+                    // Clear the form
+                    document.getElementById('chatForm').reset();
+                    // Optionally close the chat popup
+                    closeForm();
+                } else if (data.error) {
+                    displayFeedback('errors', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                displayFeedback('errors', 'Error sending message.');
+            });
+        });
+
+        // Optional: Close the chat form when clicking outside of it
+        window.onclick = function(event) {
+            var chatForm = document.getElementById("myForm");
+            if (event.target == chatForm) {
+                chatForm.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
