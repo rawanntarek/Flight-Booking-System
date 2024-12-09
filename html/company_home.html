@@ -2,10 +2,269 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Company Home</title>
+    <link rel="stylesheet" href="../css/Registration.css"> 
+    <style>
+        /* Add any additional styles here */
+        .section {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .section h2 {
+            margin-top: 0;
+        }
+        .flight-list, .message-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .flight-list li, .message-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .flight-list li:hover, .message-list li:hover {
+            background-color: #e9e9e9;
+        }
+        .feedback {
+            color: green;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px auto;
+            width: 80%;
+            display: none;
+        }
+        .error {
+            color: red;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px auto;
+            width: 80%;
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>company</h1>
+    <div class="container">
+        <!-- Feedback Messages -->
+        <div id="feedback" class="feedback"></div>
+        <div id="error" class="error"></div>
+
+        <h1>Welcome to Your Company Home</h1>
+
+        <!-- Company Name -->
+        <div class="section">
+            <h2>Company Name</h2>
+            <p id="company-name">Loading...</p>
+        </div>
+
+        <!-- Add Flight Section -->
+        <div class="section">
+            <h2>Add Flight</h2>
+            <button onclick="window.location.href='add_flight.html'">Add New Flight</button>
+        </div>
+
+        <!-- List All Available Flights -->
+        <div class="section">
+            <h2>All Available Flights</h2>
+            <ul id="flight-list" class="flight-list">
+                <li>Loading flights...</li>
+            </ul>
+        </div>
+
+        <!-- Messages from Passengers -->
+        <div class="section">
+            <h2>Messages from Passengers</h2>
+            <ul id="message-list" class="message-list">
+                <li>Loading messages...</li>
+            </ul>
+        </div>
+
+        <!-- Profile Button -->
+        <div class="section">
+            <button onclick="window.location.href='company_profile.html'">View/Edit Profile</button>
+        </div>
+    </div>
+
+    <!-- Chat Reply Modal -->
+    <div id="replyModal" style="display:none; position:fixed; top:20%; left:35%; width:30%; background-color:white; border:1px solid #ccc; padding:20px; border-radius:5px; box-shadow:0 4px 8px rgba(0,0,0,0.2);">
+        <h2>Reply to Passenger</h2>
+        <textarea id="replyMessage" placeholder="Type your reply here..." rows="5" style="width:100%;"></textarea>
+        <button onclick="sendReply()">Send Reply</button>
+        <button onclick="closeReplyModal()">Cancel</button>
+    </div>
+
+    <script>
+        // Function to display feedback messages
+        function showFeedback(message) {
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.textContent = message;
+            feedbackDiv.style.display = 'block';
+            setTimeout(() => {
+                feedbackDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Function to display error messages
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Fetch and display company name
+        function fetchCompanyName() {
+            fetch('../php/controllers/get_company_details.php', {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.company) {
+                    document.getElementById('company-name').textContent = data.company.name;
+                } else if (data.error) {
+                    showError(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching company details:', error);
+                showError('Error fetching company details.');
+            });
+        }
+
+        // Fetch and display all available flights
+        function fetchFlights() {
+            fetch('../php/controllers/get_company_flights.php', {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const flightList = document.getElementById('flight-list');
+                flightList.innerHTML = ''; // Clear existing list
+                if (data.flights && data.flights.length > 0) {
+                    data.flights.forEach(flight => {
+                        const li = document.createElement('li');
+                        li.textContent = `${flight.name} (ID: ${flight.flight_id})`;
+                        li.onclick = () => openFlightDetails(flight.flight_id);
+                        flightList.appendChild(li);
+                    });
+                } else {
+                    flightList.innerHTML = '<li>No available flights.</li>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching flights:', error);
+                const flightList = document.getElementById('flight-list');
+                flightList.innerHTML = '<li>Error fetching flights.</li>';
+            });
+        }
+
+        // Fetch and display messages from passengers
+        function fetchMessages() {
+            fetch('../php/controllers/get_company_messages.php', {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messageList = document.getElementById('message-list');
+                messageList.innerHTML = ''; // Clear existing list
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(message => {
+                        const li = document.createElement('li');
+                        li.textContent = `From: ${message.passenger_name} - ${message.message_content}`;
+                        li.onclick = () => openReplyModal(message.message_id, message.passenger_id);
+                        messageList.appendChild(li);
+                    });
+                } else {
+                    messageList.innerHTML = '<li>No messages received.</li>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching messages:', error);
+                const messageList = document.getElementById('message-list');
+                messageList.innerHTML = '<li>Error fetching messages.</li>';
+            });
+        }
+
+        // Open flight details page
+        function openFlightDetails(flight_id) {
+            window.location.href = `flight_details.html?flight_id=${flight_id}`;
+        }
+
+        // Variables to store current message and passenger IDs for reply
+        let currentMessageId = null;
+        let currentPassengerId = null;
+
+        // Open reply modal
+        function openReplyModal(message_id, passenger_id) {
+            currentMessageId = message_id;
+            currentPassengerId = passenger_id;
+            document.getElementById('replyMessage').value = '';
+            document.getElementById('replyModal').style.display = 'block';
+        }
+
+        // Close reply modal
+        function closeReplyModal() {
+            document.getElementById('replyModal').style.display = 'none';
+            currentMessageId = null;
+            currentPassengerId = null;
+        }
+
+        // Send reply to passenger
+        function sendReply() {
+            const replyContent = document.getElementById('replyMessage').value.trim();
+            if (replyContent === '') {
+                showError('Reply message cannot be empty.');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('message_id', currentMessageId);
+            formData.append('passenger_id', currentPassengerId);
+            formData.append('reply_content', replyContent);
+
+            fetch('../php/controllers/send_company_reply.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showFeedback(data.success);
+                    closeReplyModal();
+                    fetchMessages(); // Refresh messages list
+                } else if (data.error) {
+                    showError(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending reply:', error);
+                showError('Error sending reply.');
+            });
+        }
+
+        // Initialize Company Home Page
+        function initializeCompanyHome() {
+            fetchCompanyName();
+            fetchFlights();
+            fetchMessages();
+        }
+
+        // Call initialization on page load
+        window.onload = initializeCompanyHome;
+    </script>
 </body>
 </html>
