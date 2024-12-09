@@ -87,9 +87,19 @@
                 <button type="submit" class="btn">Update Email</button>
             </form>
         </div>
+        <div class="section">
+          
+
+                <button type="button" class="btn" onclick="go_home()">home page</button>
+        </div>
     </div>
 
     <script>
+
+        function go_home(){
+            window.location.href = 'company_home.html';
+        }
+
         // Function to display feedback messages
         function showFeedback(message) {
             const feedbackDiv = document.getElementById('feedback');

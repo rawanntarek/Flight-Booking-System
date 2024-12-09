@@ -32,14 +32,15 @@ $response = [];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve and sanitize form inputs
     $name = isset($_POST['name']) ? sanitize_input($_POST['name']) : '';
-    // $flight_id = isset($_POST['flight_id']) ? sanitize_input($_POST['flight_id']) : ''; // If flight ID is manual
-    $itinerary = isset($_POST['itinerary']) ? sanitize_input($_POST['itinerary']) : '';
+    $from_location = isset($_POST['from_location']) ? sanitize_input($_POST['from_location']) : '';
+    $to_location = isset($_POST['to_location']) ? sanitize_input($_POST['to_location']) : '';
     $fees = isset($_POST['fees']) ? floatval($_POST['fees']) : 0.0;
     $max_passengers = isset($_POST['max_passengers']) ? intval($_POST['max_passengers']) : 0;
-    $flight_time = isset($_POST['flight_time']) ? sanitize_input($_POST['flight_time']) : '';
+    $start_time = isset($_POST['start_time']) ? sanitize_input($_POST['start_time']) : '';
+    $end_time = isset($_POST['end_time']) ? sanitize_input($_POST['end_time']) : '';
 
     // Basic validation
-    if (empty($name) || empty($itinerary) || $fees <= 0 || $max_passengers <= 0 || empty($flight_time)) {
+    if (empty($name) || empty($from_location) || empty($to_location) || $fees <= 0 || $max_passengers <= 0 || empty($start_time) || empty($end_time)) {
         $error = "Please fill in all required fields with valid data.";
         if ($isAjax) {
             http_response_code(400); // Bad Request
@@ -52,13 +53,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
+    // Additional validation: Ensure end_time is after start_time
+    if (strtotime($end_time) <= strtotime($start_time)) {
+        $error = "End Time must be after Start Time.";
+        if ($isAjax) {
+            http_response_code(400); // Bad Request
+            $response['error'] = $error;
+            echo json_encode($response);
+        } else {
+            $_SESSION['add_flight_error'] = $error;
+            header("Location: ../../html/add_flight.html");
+        }
+        exit();
+    }
+
     // Prepare SQL statement to insert new flight
-    // Assuming flight_id is auto-incremented in the database
-    $query = "INSERT INTO flights (company_id, name, itinerary, fees, max_passengers, flight_time) VALUES (?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO flights (company_id, name, from_location, to_location, fees, max_passengers, flight_time, start_time, end_time, capacity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt = $conn->prepare($query)) {
         $company_id = $_SESSION['user_id'];
-        $stmt->bind_param("issdis", $company_id, $name, $itinerary, $fees, $max_passengers, $flight_time);
+        $flight_time = $start_time; // Define flight_time as start_time or adjust as needed
+        $capacity = $max_passengers; // Set capacity equal to max_passengers
+
+        // Correct bind_param string to match 10 parameters
+        $stmt->bind_param("isssdisssi", $company_id, $name, $from_location, $to_location, $fees, $max_passengers, $flight_time, $start_time, $end_time, $capacity);
+        
         if ($stmt->execute()) {
             $success = "Flight added successfully!";
             $stmt->close();
@@ -71,7 +90,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            $error = "Failed to add flight: " . $stmt->error;
+            // Log the error on the server
+            error_log("Add Flight Error: " . $stmt->error);
+
+            $error = "Database error. Please try again later.";
             $stmt->close();
             $conn->close();
             if ($isAjax) {
@@ -84,7 +106,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
     } else {
-        $error = "Database error: Unable to prepare statement.";
+        // Log the error on the server
+        error_log("Database Error: Unable to prepare statement in add_flight.php");
+
+        $error = "Database error. Please try again later.";
         $conn->close();
         if ($isAjax) {
             http_response_code(500); // Internal Server Error

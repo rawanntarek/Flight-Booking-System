@@ -13,8 +13,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'Company') {
 // Include the database configuration file
 require_once '../config/db_config.php';
 
-// Prepare SQL statement to fetch all flights for the company
-$query = "SELECT flight_id, name FROM flights WHERE company_id = ? AND status != 'Cancelled'";
+// Prepare SQL statement to fetch all active flights for the company
+$query = "SELECT flight_id, name FROM flights WHERE company_id = ? AND completed = 0";
 
 if ($stmt = $conn->prepare($query)) {
     $company_id = $_SESSION['user_id'];

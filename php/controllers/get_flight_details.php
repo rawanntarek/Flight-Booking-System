@@ -28,7 +28,7 @@ if ($flight_id <= 0) {
 }
 
 // Prepare SQL statement to fetch flight details
-$query = "SELECT flight_id, name, itinerary, flight_time FROM flights WHERE flight_id = ? AND company_id = ?";
+$query = "SELECT flight_id, name, from_location, to_location, flight_time FROM flights WHERE flight_id = ? AND company_id = ?";
 
 if ($stmt = $conn->prepare($query)) {
     $company_id = $_SESSION['user_id'];
@@ -40,7 +40,7 @@ if ($stmt = $conn->prepare($query)) {
         $flight = $result->fetch_assoc();
 
         // Fetch pending passengers
-        $pending_query = "SELECT passengers.name FROM passengers JOIN flight_passengers ON passengers.passenger_id = flight_passengers.passenger_id WHERE flight_passengers.flight_id = ? AND flight_passengers.status = 'Pending'";
+        $pending_query = "SELECT users.name FROM users JOIN flight_passengers ON users.user_id = flight_passengers.user_id WHERE flight_passengers.flight_id = ? AND flight_passengers.status = 'Pending' AND users.user_type = 'Passenger'";
         if ($pending_stmt = $conn->prepare($pending_query)) {
             $pending_stmt->bind_param("i", $flight_id);
             $pending_stmt->execute();
@@ -55,7 +55,7 @@ if ($stmt = $conn->prepare($query)) {
         }
 
         // Fetch registered passengers
-        $registered_query = "SELECT passengers.name FROM passengers JOIN flight_passengers ON passengers.passenger_id = flight_passengers.passenger_id WHERE flight_passengers.flight_id = ? AND flight_passengers.status = 'Registered'";
+        $registered_query = "SELECT users.name FROM users JOIN flight_passengers ON users.user_id = flight_passengers.user_id WHERE flight_passengers.flight_id = ? AND flight_passengers.status = 'Registered' AND users.user_type = 'Passenger'";
         if ($registered_stmt = $conn->prepare($registered_query)) {
             $registered_stmt->bind_param("i", $flight_id);
             $registered_stmt->execute();
@@ -74,7 +74,8 @@ if ($stmt = $conn->prepare($query)) {
             'flight' => [
                 'flight_id' => $flight['flight_id'],
                 'name' => $flight['name'],
-                'itinerary' => $flight['itinerary'],
+                'from_location' => $flight['from_location'],
+                'to_location' => $flight['to_location'],
                 'flight_time' => $flight['flight_time']
             ],
             'pending_passengers' => $pending_passengers,

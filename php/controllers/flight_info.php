@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['flight_id'])) {
     $flight_id = intval($_GET['flight_id']);
 
     // Prepare SQL statement to fetch flight details
-    $flightSql = "SELECT flight_id, name, itinerary, fees, start_time, end_time, completed FROM flights WHERE flight_id = ?";
+    $flightSql = "SELECT flight_id, name, from_location, to_location, fees, start_time, end_time, completed FROM flights WHERE flight_id = ?";
 
     if ($stmt = $conn->prepare($flightSql)) {
         $stmt->bind_param("i", $flight_id);
@@ -51,13 +51,6 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['flight_id'])) {
 
 // Close the database connection
 $conn->close();
-
-// Decode itinerary JSON
-if ($flight && isset($flight['itinerary'])) {
-    $itinerary = json_decode($flight['itinerary'], true);
-} else {
-    $itinerary = [];
-}
 ?>
 
 <!DOCTYPE html>
@@ -75,13 +68,16 @@ if ($flight && isset($flight['itinerary'])) {
         .errors {
             color: red;
         }
+        .success {
+            color: green;
+        }
         .flight-details {
             border: 1px solid #ddd;
             padding: 20px;
             border-radius: 5px;
             background-color: #f9f9f9;
         }
-        .flight-details h2 {
+        .flight-details h3 {
             margin-top: 0;
         }
         .flight-details p {
@@ -151,9 +147,9 @@ if ($flight && isset($flight['itinerary'])) {
             <div class="flight-details">
                 <h3><?php echo htmlspecialchars($flight['name']); ?></h3>
                 <p><strong>Flight ID:</strong> <?php echo htmlspecialchars($flight['flight_id']); ?></p>
-                <p><strong>From:</strong> <?php echo htmlspecialchars($itinerary['from'] ?? 'N/A'); ?></p>
-                <p><strong>To:</strong> <?php echo htmlspecialchars($itinerary['to'] ?? 'N/A'); ?></p>
-                <p><strong>Fees:</strong> $<?php echo htmlspecialchars($flight['fees']); ?></p>
+                <p><strong>From:</strong> <?php echo htmlspecialchars($flight['from_location']); ?></p>
+                <p><strong>To:</strong> <?php echo htmlspecialchars($flight['to_location']); ?></p>
+                <p><strong>Fees:</strong> $<?php echo htmlspecialchars(number_format($flight['fees'], 2)); ?></p>
                 <p><strong>Start Time:</strong> <?php echo htmlspecialchars($flight['start_time']); ?></p>
                 <p><strong>End Time:</strong> <?php echo htmlspecialchars($flight['end_time']); ?></p>
                 <p><strong>Status:</strong> <?php echo ($flight['completed']) ? 'Completed' : 'Upcoming'; ?></p>
@@ -168,15 +164,22 @@ if ($flight && isset($flight['itinerary'])) {
                     <?php if ($_SESSION['user_type'] === 'Passenger'): ?>
                         <label for="payment_method">Payment Method:</label>
                         <select name="payment_method" id="payment_method" required>
-                            <option value="">Select Payment Method</option>
+                            <option value="" disabled selected>Select Payment Method</option>
                             <option value="balance">Pay from Account Balance</option>
                             <option value="cash">Pay Cash</option>
                         </select>
-                    <?php endif; ?>
-
-                    <?php if ($_SESSION['user_type'] === 'Passenger'): ?>
-                        <!-- For Passengers, payment method is always from balance -->
-                        <!-- <input type="hidden" name="payment_method" value="balance"> -->
+                    <?php elseif ($_SESSION['user_type'] === 'Company'): ?>
+                        <!-- For Companies, payment method is handled differently or not required -->
+                        <!-- If Companies need to select payment method, uncomment below -->
+                        <!--
+                        <label for="payment_method">Payment Method:</label>
+                        <select name="payment_method" id="payment_method" required>
+                            <option value="" disabled selected>Select Payment Method</option>
+                            <option value="balance">Pay from Account Balance</option>
+                            <option value="cash">Pay Cash</option>
+                        </select>
+                        -->
+                        <!-- If not needed, you can remove the payment_method field or set a default value in book_flight.php -->
                     <?php endif; ?>
 
                     <input type="submit" value="Book Flight">

@@ -4,7 +4,6 @@ session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    // If not logged in, redirect to login page
     header("Location: ../../html/login.html");
     exit();
 }
@@ -22,18 +21,11 @@ $from = $to = "";
 $flights = [];
 $errors = [];
 
-// Enable detailed error reporting (for development only)
-// Comment out or remove these lines in production
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Retrieve the user ID from the session
 $user_id = $_SESSION['user_id'];
 
 // Check if the form is submitted via GET
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    // Retrieve and sanitize form inputs
     $from = sanitize_input($_GET['from'] ?? '');
     $to = sanitize_input($_GET['to'] ?? '');
 
@@ -66,16 +58,18 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
     $conditions = [];
     $params = [$user_id]; // Initialize with user_id for the subquery
-    $types = "i"; // Assuming user_id is an integer
+    $types = "i"; // user_id is integer
 
+    // Add conditions for from_location if provided
     if (!empty($from)) {
-        $conditions[] = "JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.from')) LIKE ?";
+        $conditions[] = "f.from_location LIKE ?";
         $params[] = "%" . $from . "%";
         $types .= "s";
     }
 
+    // Add conditions for to_location if provided
     if (!empty($to)) {
-        $conditions[] = "JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.to')) LIKE ?";
+        $conditions[] = "f.to_location LIKE ?";
         $params[] = "%" . $to . "%";
         $types .= "s";
     }
@@ -94,33 +88,33 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
     ";
 
     if ($stmt = $conn->prepare($searchSql)) {
-        // Bind parameters
         if (!empty($params)) {
-            // Use the splat operator to unpack the $params array
             $stmt->bind_param($types, ...$params);
         }
         if ($stmt->execute()) {
             $result = $stmt->get_result();
-
-            // Fetch all matching flights
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $flights[] = $row;
                 }
             } else {
-                $errors[] = "No flights found matching your criteria.";
+                // If no flights found and no conditions were given, it means no flights match the main criteria
+                // If from and to are empty, this means no available flights
+                if (empty($from) && empty($to)) {
+                    $errors[] = "No available flights found.";
+                } else {
+                    $errors[] = "No flights found matching your criteria.";
+                }
             }
         } else {
             $errors[] = "Database error: Execution failed. " . $stmt->error;
         }
-
         $stmt->close();
     } else {
         $errors[] = "Database error: Unable to prepare statement. " . $conn->error;
     }
 }
 
-// Close the database connection
 $conn->close();
 ?>
 
@@ -129,7 +123,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>Search Results</title>
-    <link rel="stylesheet" href="../../css/Registration.css"> <!-- Reusing Registration.css for styling -->
+    <link rel="stylesheet" href="../../css/Registration.css">
     <style>
         .container {
             width: 80%;
@@ -138,9 +132,6 @@ $conn->close();
         }
         .errors {
             color: red;
-        }
-        .success {
-            color: green;
         }
         table {
             width: 100%;
@@ -181,7 +172,6 @@ $conn->close();
     <div class="container">
         <h2>Search Results</h2>
 
-        <!-- Display error messages -->
         <?php if (!empty($errors)): ?>
             <div class="errors">
                 <ul>
@@ -192,7 +182,6 @@ $conn->close();
             </div>
         <?php endif; ?>
 
-        <!-- Display flights if any -->
         <?php if (!empty($flights)): ?>
             <table>
                 <thead>
@@ -222,9 +211,13 @@ $conn->close();
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        <?php else: ?>
+            <!-- If no flights and no errors, this means no matches -->
+            <?php if (empty($errors)): ?>
+                <p>No flights found.</p>
+            <?php endif; ?>
         <?php endif; ?>
 
-        <!-- Back to Dashboard Link -->
         <a href="../../html/dashboard.html" class="back-link">← Back to Dashboard</a>
     </div>
 </body>
