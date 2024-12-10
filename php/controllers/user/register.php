@@ -3,7 +3,7 @@
 session_start();
 
 // Include the database configuration file
-require_once '../config/db_config.php';
+require_once '../../config/db_config.php';
 
 // Function to sanitize user input
 function sanitize_input($data) {
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Registration successful, redirect to login.html
             $stmt->close();
             $conn->close();
-            header("Location: ../../html/Login.html");
+            header("Location: ../../../html/Login.html");
             exit();
         } else {
             // Insertion failed
@@ -80,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 } else {
     // If the form was not submitted via POST, redirect to registration page
-    header("Location: ../../html/Registration.html");
+    header("Location: ../../../html/Registration.html");
     exit();
 }
 ?>

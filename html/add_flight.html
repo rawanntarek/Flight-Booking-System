@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Flight</title>
+    <link rel="stylesheet" href="../css/Registration.css"> 
+    <style>
+        /* Additional Styles */
+        .section {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .section h2 {
+            margin-top: 0;
+        }
+        .feedback {
+            color: green;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px auto;
+            width: 80%;
+            display: none;
+        }
+        .error {
+            color: red;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px auto;
+            width: 80%;
+            display: none;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Feedback Messages -->
+        <div id="feedback" class="feedback"></div>
+        <div id="error" class="error"></div>
+
+        <div class="section">
+            <h2>Add New Flight</h2>
+            <form id="addFlightForm">
+                <label for="flight-name">Name:</label>
+                <input type="text" id="flight-name" name="name" required>
+
+                <label for="from-location">From:</label>
+                <input type="text" id="from-location" name="from_location" required>
+
+                <label for="to-location">To:</label>
+                <input type="text" id="to-location" name="to_location" required>
+
+                <label for="fees">Fees ($):</label>
+                <input type="number" id="fees" name="fees" min="0" step="0.01" required>
+
+                <label for="max-passengers">Max Number of Passengers:</label>
+                <input type="number" id="max-passengers" name="max_passengers" min="1" required>
+
+                <label for="start-time">Start Time:</label>
+                <input type="datetime-local" id="start-time" name="start_time" required>
+
+                <label for="end-time">End Time:</label>
+                <input type="datetime-local" id="end-time" name="end_time" required>
+
+                <button type="submit" class="btn">Add Flight</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/add_flight.js"></script>
+
+</body>
+</html>

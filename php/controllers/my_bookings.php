@@ -33,8 +33,8 @@ $bookingSql = "
     SELECT 
         f.flight_id, 
         f.name, 
-        JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.from')) AS from_location, 
-        JSON_UNQUOTE(JSON_EXTRACT(f.itinerary, '$.to')) AS to_location, 
+        f.from_location, 
+        f.to_location, 
         f.fees, 
         f.start_time, 
         f.end_time, 

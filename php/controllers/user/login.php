@@ -3,7 +3,7 @@
 session_start();
 
 // Include the database configuration file
-require_once '../config/db_config.php';
+require_once '../../config/db_config.php';
 
 // Function to sanitize user input
 function sanitize_input($data) {
@@ -18,13 +18,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Basic validation
     if (empty($email) || empty($password)) {
-        // You can redirect back with an error message or handle it as per your design
-        die("Please fill in all required fields.");
+        // Redirect back with an error message
+        $_SESSION['login_error'] = "Please fill in all required fields.";
+        header("Location: ../../../html/Login.html");
+        exit();
     }
 
     // Validate email format
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die("Invalid email format.");
+        $_SESSION['login_error'] = "Invalid email format.";
+        header("Location: ../../../html/Login.html");
+        exit();
     }
 
     // Prepare SQL statement to retrieve user by email
@@ -59,28 +63,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->close();
                 $conn->close();
 
-                // Redirect to dashboard.html
-                header("Location: ../../html/dashboard.html");
+                // Redirect based on user_type
+                if ($user_type === 'Passenger') {
+                    header("Location: ../../../html/dashboard.html");
+                } elseif ($user_type === 'Company') {
+                    header("Location: ../../../html/company_home.html");
+                } else {
+                    // In case user_type is neither 'Passenger' nor 'Company'
+                    $_SESSION['login_error'] = "Unknown user type.";
+                    header("Location: ../../../html/Login.html");
+                }
                 exit();
             } else {
                 // Password is incorrect
+                $_SESSION['login_error'] = "Invalid email or password.";
                 $stmt->close();
                 $conn->close();
-                die("Invalid email or password.");
+                header("Location: ../../../html/Login.html");
+                exit();
             }
         } else {
             // No user found with the provided email
+            $_SESSION['login_error'] = "Invalid email or password.";
             $stmt->close();
             $conn->close();
-            die("Invalid email or password.");
+            header("Location: ../../../html/Login.html");
+            exit();
         }
     } else {
         // Failed to prepare the SQL statement
-        die("Database error: Unable to prepare statement.");
+        $_SESSION['login_error'] = "Database error: Unable to prepare statement.";
+        $conn->close();
+        header("Location: ../../../html/Login.html");
+        exit();
     }
 } else {
     // If the form was not submitted via POST, redirect to the login page
-    header("Location: ../../html/Login.html");
+    header("Location: ../../../html/Login.html");
     exit();
 }
 ?>

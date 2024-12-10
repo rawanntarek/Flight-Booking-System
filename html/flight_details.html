@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Details</title>
+    <link rel="stylesheet" href="../css/Registration.css"> 
+    <style>
+        /* Add any additional styles here */
+        .section {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .section h2 {
+            margin-top: 0;
+        }
+        .list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .list li {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+        }
+        .feedback {
+            color: green;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px auto;
+            width: 80%;
+            display: none;
+        }
+        .error {
+            color: red;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px auto;
+            width: 80%;
+            display: none;
+        }
+        .button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Feedback Messages -->
+        <div id="feedback" class="feedback"></div>
+        <div id="error" class="error"></div>
+
+        <h1>Flight Details</h1>
+
+        <!-- Flight Information -->
+        <div class="section">
+            <h2>Flight Information</h2>
+            <p><strong>ID:</strong> <span id="flight-id">Loading...</span></p>
+            <p><strong>Name:</strong> <span id="flight-name">Loading...</span></p>
+            <p><strong>Itinerary:</strong> <span id="flight-itinerary">Loading...</span></p>
+            <p><strong>Flight Time:</strong> <span id="flight-time">Loading...</span></p>
+        </div>
+
+        <!-- Pending Passengers -->
+        <div class="section">
+            <h2>Pending Passengers</h2>
+            <ul id="pending-passengers" class="list">
+                <li>Loading...</li>
+            </ul>
+        </div>
+
+        <!-- Registered Passengers -->
+        <div class="section">
+            <h2>Registered Passengers</h2>
+            <ul id="registered-passengers" class="list">
+                <li>Loading...</li>
+            </ul>
+        </div>
+
+        <!-- Cancel Flight Button -->
+        <div class="section">
+            <button class="button" onclick="confirmCancelFlight()">Cancel Flight and Refund Passengers</button>
+        </div>
+
+        <!-- Profile Button -->
+        <div class="section">
+            <button onclick="window.location.href='company_profile.html'" class="btn">View/Edit Profile</button>
+        </div>
+    </div>
+
+     
+    <script src="../js/flight_details.js"></script>
+
+</body>
+</html>
