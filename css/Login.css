@@ -2,7 +2,7 @@ body {
     font-family: Georgia, 'Times New Roman', Times, serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(-45deg, #3086ae, #cfe6ff, #23a6d5, #000336);    
+    background: linear-gradient(-45deg, #a1d8e5, #b9dcea, #5bdbff);    
     background-size: cover;
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
@@ -30,7 +30,7 @@ body {
     top: 0;
     left: 25%;
     transform: translateX(50%);
-    transform: translateY(22%);
+    transform: translateY(30%);
     z-index: -1;
     width: 60%; /* Adjust width to make the image smaller */
     max-width: 400px; /* Limit the maximum width */
@@ -40,9 +40,11 @@ body {
 }
 
 .image-container img {
-    width: 700px; /* Ensure the image scales with the container */
-    height: 500px; /* Maintain aspect ratio */
-    border-radius: 10px; /* Optional: Add rounded corners to the image */
+    width: 540px; 
+    height: 420px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
 }
 
 form {
