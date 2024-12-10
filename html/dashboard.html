@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
-<<<<<<< HEAD
     <link rel="stylesheet" href="../css/Dashboard.css"> <!-- Reusing Registration.css for styling -->
   
 </head>
@@ -21,73 +20,19 @@
     <br>
     <text>book your next adventure today!</text>
        
-=======
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Reusing Registration.css for styling -->
-    <link rel="stylesheet" href="../css/Registration.css"> 
-    <link rel="stylesheet" href="../css/dashboard.css"> 
-
-   
-</head>
-<body>
-    <div class="container">
-        <!-- Display Feedback Messages -->
-        <div id="feedback"></div>
-
-        <h1>Welcome to Your Dashboard</h1>
-        <!-- Add more dashboard content here -->
-
-        <!-- Links to Profile, Bookings, and Logout -->
-        <a href="../php/controllers/profile.php" class="button">View/Edit Profile</a>
-        <a href="../php/controllers/my_bookings.php" class="button">My Bookings</a>
-        <a href="../php/controllers/logout.php" class="button">Logout</a>
-
-        <!-- Search a Flight Section -->
->>>>>>> 8d9e85fcbe4fe305337112971211889ea5ba2035
         <div class="search-section">
             
             <form method="GET" action="../php/controllers/search_flight.php" class="search-form">
                 
                 <label for="from">From:</label>
-                <input type="text" id="from" name="from" placeholder="Enter departure location" >
+                <input type="text" id="from" name="from" placeholder="Enter departure location">
 
                 <label for="to">To:</label>
-<<<<<<< HEAD
                 <input type="text" id="to" name="to" placeholder="Enter destination location">
                 <br>
-=======
-                <input type="text" id="to" name="to" placeholder="Enter destination location" >
-
->>>>>>> 8d9e85fcbe4fe305337112971211889ea5ba2035
                 <input type="submit" value="Search">
             </form>
         </div>
     </div>
-
-    <!-- Chat Popup -->
-    <button class="open-button" onclick="openForm()">Chat</button>
-
-    <div class="chat-popup" id="myForm">
-      <form id="chatForm" class="form-container">
-        <h1>Send a Message</h1>
-
-        <label for="company"><b>Select Company</b></label>
-        <select name="company_id" id="company" required>
-            <option value="" disabled selected>Select a company</option>
-            <!-- Options will be populated via JavaScript -->
-        </select>
-
-        <label for="msg"><b>Message</b></label>
-        <textarea placeholder="Type your message.." name="message_content" id="msg" required></textarea>
-
-        <button type="submit" class="btn">Send</button>
-        <button type="button" class="btn " style="background-color: orange;" onclick="viewMessage()">View messages</button>
-        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-      </form>
-    </div>
-
-    <!-- Include JavaScript at the end of body -->
-    <script src="../js/dashboard.js"></script>
-
 </body>
 </html>
