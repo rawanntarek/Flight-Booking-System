@@ -5,12 +5,12 @@ session_start();
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     // If not logged in, redirect to login page
-    header("Location: ../../html/login.html");
+    header("Location: ../../../html/login.html");
     exit();
 }
 
 // Include the database configuration file
-require_once '../config/db_config.php';
+require_once '../../config/db_config.php';
 
 // Function to sanitize user input
 function sanitize_input($data) {
@@ -184,7 +184,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>Book Flight</title>
-    <link rel="stylesheet" href="../../css/Registration.css"> <!-- Reusing Registration.css for styling -->
+    <link rel="stylesheet" href="../../../css/Registration.css"> <!-- Reusing Registration.css for styling -->
     <style>
         .container {
             width: 60%;
@@ -235,7 +235,7 @@ $conn->close();
         <?php endif; ?>
 
         <!-- Back to Flight Info Link -->
-        <a href="../../html/dashboard.html" class="button">Back to Flight Info</a>
+        <a href="../../../html/dashboard.html" class="button">Back to Flight Info</a>
     </div>
 </body>
 </html>

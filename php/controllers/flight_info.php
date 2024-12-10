@@ -158,7 +158,7 @@ $conn->close();
             <!-- Booking Section -->
             <div class="book-section">
                 <h3>Book This Flight</h3>
-                <form method="POST" action="../controllers/book_flight.php">
+                <form method="POST" action="../controllers/user/book_flight.php">
                     <input type="hidden" name="flight_id" value="<?php echo htmlspecialchars($flight['flight_id']); ?>">
 
                     <?php if ($_SESSION['user_type'] === 'Passenger'): ?>
