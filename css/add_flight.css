@@ -1,0 +1,79 @@
+body {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin: 0;
+    padding: 0;
+    background-image: url("../airplane.png");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center; 
+    height: 100vh;
+}
+
+form {
+    margin-left: 150px;
+    background: #ffffff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 360px;
+}
+
+text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #052b53;
+    margin-bottom: 10px;
+    display: block;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    color: #052b53;
+    font-weight: 900;
+    font-size: 15px;
+}
+
+input,select {
+    width: 95%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #777777;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-left: 0px;
+}
+
+
+ input[type="submit"] {
+    background-color: #052b53;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+ input[type="submit"]:hover {
+    background-color: #cedae7;
+}
+/* Feedback & Error Messages */
+.feedback, .error {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.feedback {
+    color: green;
+}
+
+.error {
+    color: red;
+}
