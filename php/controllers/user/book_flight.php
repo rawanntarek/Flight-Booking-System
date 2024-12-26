@@ -82,8 +82,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $errors[] = "Invalid payment method selected.";
         }
     } elseif ($user_type === 'Passenger') {
-        // For Passengers, payment method is always 'balance'
-        $payment_method = 'balance';
+        if (empty($payment_method) || !in_array($payment_method, ['balance', 'cash'])) {
+            $errors[] = "Invalid payment method selected.";
+        }
     } else {
         $errors[] = "Unknown user type.";
     }
@@ -94,78 +95,154 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conn->begin_transaction();
 
         try {
-            if ($user_type === 'Passenger' || ($user_type === 'Company' && $payment_method === 'balance')) {
-                // For Passenger or Company paying from balance
+            if ($user_type === 'Passenger') {
+                if ($payment_method === 'balance') {
+                    // Handle Passenger paying via balance
+                    $user_id = $_SESSION['user_id'];
+                    $fee = floatval($flight['fees']);
 
-                // Check if user has sufficient balance
-                $user_id = $_SESSION['user_id'];
-                $fee = floatval($flight['fees']);
+                    // Check if user has sufficient balance
+                    $balanceSql = "SELECT account_balance FROM users WHERE user_id = ?";
+                    if ($stmt = $conn->prepare($balanceSql)) {
+                        $stmt->bind_param("i", $user_id);
+                        $stmt->execute();
+                        $stmt->bind_result($account_balance);
+                        $stmt->fetch();
+                        $stmt->close();
 
-                $balanceSql = "SELECT account_balance FROM users WHERE user_id = ?";
-                if ($stmt = $conn->prepare($balanceSql)) {
-                    $stmt->bind_param("i", $user_id);
-                    $stmt->execute();
-                    $stmt->bind_result($account_balance);
-                    $stmt->fetch();
-                    $stmt->close();
+                        if ($account_balance < $fee) {
+                            throw new Exception("Insufficient account balance.");
+                        }
 
-                    if ($account_balance < $fee) {
-                        throw new Exception("Insufficient account balance.");
+                        // Deduct the fee from account_balance
+                        $new_balance = $account_balance - $fee;
+                        $updateBalanceSql = "UPDATE users SET account_balance = ? WHERE user_id = ?";
+                        if ($stmt = $conn->prepare($updateBalanceSql)) {
+                            $stmt->bind_param("di", $new_balance, $user_id);
+                            if (!$stmt->execute()) {
+                                throw new Exception("Failed to update account balance.");
+                            }
+                            $stmt->close();
+                        } else {
+                            throw new Exception("Database error: Unable to prepare balance update statement.");
+                        }
+                    } else {
+                        throw new Exception("Database error: Unable to prepare balance check statement.");
                     }
 
-                    // Deduct the fee from account_balance
-                    $new_balance = $account_balance - $fee;
-                    $updateBalanceSql = "UPDATE users SET account_balance = ? WHERE user_id = ?";
-                    if ($stmt = $conn->prepare($updateBalanceSql)) {
-                        $stmt->bind_param("di", $new_balance, $user_id);
+                    // Insert into flight_passengers with status 'Registered' and payment_method 'balance'
+                    $insertBookingSql = "INSERT INTO flight_passengers (flight_id, user_id, status, payment_method) VALUES (?, ?, 'Registered', 'balance')";
+                    if ($stmt = $conn->prepare($insertBookingSql)) {
+                        $stmt->bind_param("ii", $flight_id, $user_id);
                         if (!$stmt->execute()) {
-                            throw new Exception("Failed to update account balance.");
+                            throw new Exception("Failed to create booking.");
                         }
                         $stmt->close();
                     } else {
-                        throw new Exception("Database error: Unable to prepare balance update statement.");
+                        throw new Exception("Database error: Unable to prepare booking statement.");
                     }
-                } else {
-                    throw new Exception("Database error: Unable to prepare balance check statement.");
-                }
 
-                // Insert into flight_passengers with status 'Registered'
-                $insertBookingSql = "INSERT INTO flight_passengers (flight_id, user_id, status) VALUES (?, ?, 'Registered')";
-                if ($stmt = $conn->prepare($insertBookingSql)) {
-                    $stmt->bind_param("ii", $flight_id, $user_id);
-                    if (!$stmt->execute()) {
-                        throw new Exception("Failed to create booking.");
+                    // Commit transaction
+                    $conn->commit();
+
+                    $success = "Flight booked successfully and $" . number_format($fee, 2) . " has been deducted from your account balance.";
+                } elseif ($payment_method === 'cash') {
+                    // Handle Passenger paying via cash
+
+                    // Insert into flight_passengers with status 'Pending' and payment_method 'cash'
+                    $insertBookingSql = "INSERT INTO flight_passengers (flight_id, user_id, status, payment_method) VALUES (?, ?, 'Pending', 'cash')";
+                    if ($stmt = $conn->prepare($insertBookingSql)) {
+                        $stmt->bind_param("ii", $flight_id, $_SESSION['user_id']);
+                        if (!$stmt->execute()) {
+                            throw new Exception("Failed to create booking.");
+                        }
+                        $stmt->close();
+                    } else {
+                        throw new Exception("Database error: Unable to prepare booking statement.");
                     }
-                    $stmt->close();
+
+                    // Commit transaction
+                    $conn->commit();
+
+                    $success = "Flight booked successfully. Please proceed to pay cash at the designated location.";
                 } else {
-                    throw new Exception("Database error: Unable to prepare booking statement.");
+                    throw new Exception("Invalid payment method for Passenger.");
                 }
+            } elseif ($user_type === 'Company') {
+                if ($payment_method === 'balance') {
+                    // Handle Company paying via balance
+                    $user_id = $_SESSION['user_id'];
+                    $fee = floatval($flight['fees']);
 
-                // Commit transaction
-                $conn->commit();
+                    // Check if company has sufficient balance
+                    $balanceSql = "SELECT account_balance FROM users WHERE user_id = ?";
+                    if ($stmt = $conn->prepare($balanceSql)) {
+                        $stmt->bind_param("i", $user_id);
+                        $stmt->execute();
+                        $stmt->bind_result($account_balance);
+                        $stmt->fetch();
+                        $stmt->close();
 
-                $success = "Flight booked successfully and $" . number_format($fee, 2) . " has been deducted from your account balance.";
-            } elseif ($user_type === 'Company' && $payment_method === 'cash') {
-                // For Company paying cash
+                        if ($account_balance < $fee) {
+                            throw new Exception("Insufficient account balance.");
+                        }
 
-                // Insert into flight_passengers with status 'Pending'
-                $insertBookingSql = "INSERT INTO flight_passengers (flight_id, user_id, status) VALUES (?, ?, 'Pending')";
-                if ($stmt = $conn->prepare($insertBookingSql)) {
-                    $stmt->bind_param("ii", $flight_id, $_SESSION['user_id']);
-                    if (!$stmt->execute()) {
-                        throw new Exception("Failed to create booking.");
+                        // Deduct the fee from account_balance
+                        $new_balance = $account_balance - $fee;
+                        $updateBalanceSql = "UPDATE users SET account_balance = ? WHERE user_id = ?";
+                        if ($stmt = $conn->prepare($updateBalanceSql)) {
+                            $stmt->bind_param("di", $new_balance, $user_id);
+                            if (!$stmt->execute()) {
+                                throw new Exception("Failed to update account balance.");
+                            }
+                            $stmt->close();
+                        } else {
+                            throw new Exception("Database error: Unable to prepare balance update statement.");
+                        }
+                    } else {
+                        throw new Exception("Database error: Unable to prepare balance check statement.");
                     }
-                    $stmt->close();
+
+                    // Insert into flight_passengers with status 'Registered' and payment_method 'balance'
+                    $insertBookingSql = "INSERT INTO flight_passengers (flight_id, user_id, status, payment_method) VALUES (?, ?, 'Registered', 'balance')";
+                    if ($stmt = $conn->prepare($insertBookingSql)) {
+                        $stmt->bind_param("ii", $flight_id, $user_id);
+                        if (!$stmt->execute()) {
+                            throw new Exception("Failed to create booking.");
+                        }
+                        $stmt->close();
+                    } else {
+                        throw new Exception("Database error: Unable to prepare booking statement.");
+                    }
+
+                    // Commit transaction
+                    $conn->commit();
+
+                    $success = "Flight booked successfully and $" . number_format($fee, 2) . " has been deducted from your account balance.";
+                } elseif ($payment_method === 'cash') {
+                    // Handle Company paying via cash
+
+                    // Insert into flight_passengers with status 'Pending' and payment_method 'cash'
+                    $insertBookingSql = "INSERT INTO flight_passengers (flight_id, user_id, status, payment_method) VALUES (?, ?, 'Pending', 'cash')";
+                    if ($stmt = $conn->prepare($insertBookingSql)) {
+                        $stmt->bind_param("ii", $flight_id, $_SESSION['user_id']);
+                        if (!$stmt->execute()) {
+                            throw new Exception("Failed to create booking.");
+                        }
+                        $stmt->close();
+                    } else {
+                        throw new Exception("Database error: Unable to prepare booking statement.");
+                    }
+
+                    // Commit transaction
+                    $conn->commit();
+
+                    $success = "Flight booked successfully. Please proceed to pay cash at the designated location.";
                 } else {
-                    throw new Exception("Database error: Unable to prepare booking statement.");
+                    throw new Exception("Invalid payment method for Company.");
                 }
-
-                // Commit transaction
-                $conn->commit();
-
-                $success = "Flight booked successfully. Please proceed to pay cash at the designated location.";
             } else {
-                throw new Exception("Invalid booking process.");
+                throw new Exception("Invalid user type.");
             }
         } catch (Exception $e) {
             // Rollback transaction on error

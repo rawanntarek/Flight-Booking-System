@@ -143,25 +143,15 @@ $conn->close();
                                     <input type="hidden" name="flight_id" value="<?php echo htmlspecialchars($flight['flight_id']); ?>">
 
                                     <?php if ($_SESSION['user_type'] === 'Passenger'): ?>
-                                        <label for="payment_method">Payment Method:</label>
-                                        <select name="payment_method" id="payment_method" required>
-                                            <option value="" disabled selected>Select Payment Method</option>
-                                            <option value="balance">Pay from Account Balance</option>
-                                            <option value="cash">Pay Cash</option>
-                                        </select>
-                                    <?php elseif ($_SESSION['user_type'] === 'Company'): ?>
-                                        <!-- For Companies, payment method is handled differently or not required -->
-                                        <!-- If Companies need to select payment method, uncomment below -->
-                                        <!--
-                                        <label for="payment_method">Payment Method:</label>
-                                        <select name="payment_method" id="payment_method" required>
-                                            <option value="" disabled selected>Select Payment Method</option>
-                                            <option value="balance">Pay from Account Balance</option>
-                                            <option value="cash">Pay Cash</option>
-                                        </select>
-                                        -->
-                                        <!-- If not needed, you can remove the payment_method field or set a default value in book_flight.php -->
-                                    <?php endif; ?>
+    <label for="payment_method">Payment Method:</label>
+    <select name="payment_method" id="payment_method" required>
+        <option value="" disabled selected>Select Payment Method</option>
+        <option value="balance">Pay from Account Balance</option>
+        <option value="cash">Pay Cash</option>
+    </select>
+<?php elseif ($_SESSION['user_type'] === 'Company'): ?>
+<?php endif; ?>
+
 
                                     <input type="submit" value="Book Flight">
                                 </form>
