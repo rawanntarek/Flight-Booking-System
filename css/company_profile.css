@@ -56,7 +56,15 @@ nav a:hover{
     padding: 10px;
     border-bottom: 1px solid #ddd;
 }
-
+.section img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px; /* Space between logo and text */
+    vertical-align: middle;
+    
+}
 
 button {
     display: inline-block;

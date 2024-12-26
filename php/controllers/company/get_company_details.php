@@ -14,20 +14,21 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'Company') {
 require_once '../../config/db_config.php';
 
 // Prepare SQL statement to fetch company details
-$query = "SELECT name, email, account_balance FROM users WHERE user_id = ?";
-
+$query = "SELECT users.name, users.email, users.account_balance, companies.bio, companies.address FROM users JOIN companies ON users.user_id = companies.user_id WHERE users.user_id = ?";
 if ($stmt = $conn->prepare($query)) {
     $user_id = $_SESSION['user_id'];
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
-    $stmt->bind_result($name, $email, $account_balance);
+    $stmt->bind_result($name, $email, $account_balance,$bio,$address);
     $stmt->fetch();
 
     $response = [
         'company' => [
             'name' => $name,
             'email' => $email,
-            'account_balance' => $account_balance
+            'account_balance' => $account_balance,
+            'bio' => $bio, 
+            'address' => $address
         ]
     ];
 

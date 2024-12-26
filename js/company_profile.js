@@ -22,7 +22,26 @@
                 errorDiv.style.display = 'none';
             }, 5000);
         }
+        // Handle Edit Image Form Submission
 
+        function fetchCompanyLogo() {
+            fetch('../php/controllers/company/get_company_logo.php', {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.logo_url) {
+                    document.getElementById('company-logo').src = data.logo_url;
+                    
+                } else if (data.error) {
+                    showError(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching company logo:', error);
+                showError('Error fetching company logo.');
+            }); 
+        }
         // Fetch and display company profile details
         function fetchProfileDetails() {
             fetch('../php/controllers/company/get_company_details.php', {
@@ -34,7 +53,8 @@
                 if (data.company) {
                     document.getElementById('company-name').textContent = data.company.name;
                     document.getElementById('company-email').textContent = data.company.email;
-
+                    document.getElementById('company-bio').textContent = data.company.bio;
+                    document.getElementById('company-address').textContent = data.company.address;
                     // Ensure account_balance is a number before using toFixed
                     const accountBalance = parseFloat(data.company.account_balance);
                     if (!isNaN(accountBalance)) {
@@ -46,6 +66,10 @@
                     // Populate edit form fields
                     document.getElementById('edit-name').value = data.company.name;
                     document.getElementById('edit-email').value = data.company.email;
+                    document.getElementById('edit-bio').value = data.company.bio;
+                    document.getElementById('edit-address').value = data.company.address;
+
+
                 } else if (data.error) {
                     showError(data.error);
                 }
@@ -133,10 +157,113 @@
                 showError('Error updating email.');
             });
         });
+ // Handle Edit Email Form Submission
+        document.getElementById('editBioForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
 
+            const bio = document.getElementById('edit-bio').value.trim();
+
+            if (bio === '') {
+                showError('Bio cannot be empty.');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('bio', bio);
+
+            // Send the updated bio via AJAX
+            fetch('../php/controllers/company/update_company_profile.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showFeedback(data.success);
+                    fetchProfileDetails(); // Refresh profile details
+                } else if (data.error) {
+                    showError(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating bio:', error);
+                showError('Error updating bio.');
+            });
+        });
+         // Handle Edit Email Form Submission
+         document.getElementById('editAddressForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const address = document.getElementById('edit-address').value.trim();
+
+            if (address === '') {
+                showError('Address cannot be empty.');
+                return;
+            }
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('address', address);
+
+            // Send the updated bio via AJAX
+            fetch('../php/controllers/company/update_company_profile.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showFeedback(data.success);
+                    fetchProfileDetails(); // Refresh profile details
+                } else if (data.error) {
+                    showError(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating address:', error);
+                showError('Error updating adress.');
+            });
+        });
+
+        function fetchFlights() {
+            fetch('../php/controllers/get_company_flights.php', {
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                const flightList = document.getElementById('flight-list');
+                flightList.innerHTML = ''; // Clear existing list
+                if (data.flights && data.flights.length > 0) {
+                    data.flights.forEach(flight => {
+                        const li = document.createElement('li');
+                        li.textContent = `${flight.name} (ID: ${flight.flight_id})`;
+                        li.onclick = () => openFlightDetails(flight.flight_id);
+                        flightList.appendChild(li);
+                    });
+                } else {
+                    flightList.innerHTML = '<li>No available flights.</li>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching flights:', error);
+                const flightList = document.getElementById('flight-list');
+                flightList.innerHTML = '<li>Error fetching flights.</li>';
+            });
+        }
         // Initialize Company Profile Page
         function initializeProfilePage() {
             fetchProfileDetails();
+            fetchCompanyLogo();
+            fetchFlights();
         }
 
         // Call initialization on page load

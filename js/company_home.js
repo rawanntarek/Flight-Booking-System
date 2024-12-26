@@ -36,6 +36,30 @@ function fetchCompanyName() {
         showError('Error fetching company details.');
     });
 }
+// Function to fetch and display the company logo
+// Function to fetch and display the company logo
+
+function fetchCompanyLogo() {
+    fetch('../php/controllers/company/get_company_logo.php', {
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.logo_url) {
+            document.getElementById('company-logo').src = data.logo_url;
+            
+        } else if (data.error) {
+            showError(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching company logo:', error);
+        showError('Error fetching company logo.');
+    }); 
+}
+
+
+
 
 // Fetch and display all available flights
 function fetchFlights() {
@@ -156,6 +180,7 @@ function sendReply() {
 // Initialize Company Home Page
 function initializeCompanyHome() {
     fetchCompanyName();
+    fetchCompanyLogo();
     fetchFlights();
     fetchMessages();
 }

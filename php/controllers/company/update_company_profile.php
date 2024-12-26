@@ -29,25 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check which field is being updated
     $name = isset($_POST['name']) ? sanitize_input($_POST['name']) : null;
     $email = isset($_POST['email']) ? sanitize_input($_POST['email']) : null;
+    $bio = isset($_POST['bio']) ? sanitize_input($_POST['bio']) : null;
+    $address = isset($_POST['address']) ? sanitize_input($_POST['address']) : null;
 
     // Determine which field to update
-    $fields_to_update = [];
-    $params = [];
-    $types = '';
-
-    if ($name !== null && $email !== null) {
-        // Both fields are being updated; reject the request
-        $error = "Please update either Name or Email, not both at the same time.";
-        if ($isAjax) {
-            http_response_code(400); // Bad Request
-            $response['error'] = $error;
-            echo json_encode($response);
-        } else {
-            $_SESSION['update_profile_error'] = $error;
-            header("Location: ../../../html/company_profile.html");
-        }
-        exit();
-    }
+    $users_fields_to_update = [];
+    $companies_fields_to_update = [];
 
     if ($name !== null) {
         // Update name
@@ -63,9 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         }
-        $fields_to_update[] = "name = ?";
-        $params[] = $name;
-        $types .= "s";
+        $users_fields_to_update[] = "name = '$name'";
     }
 
     if ($email !== null) {
@@ -97,12 +82,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
-        $fields_to_update[] = "email = ?";
-        $params[] = $email;
-        $types .= "s";
+        $users_fields_to_update[] = "email = '$email'";
     }
 
-    if (empty($fields_to_update)) {
+    if ($bio !== null) {
+        // Update bio
+        if (empty($bio)) {
+            $error = "Bio cannot be empty.";
+            if ($isAjax) {
+                http_response_code(400);
+                $response['error'] = $error;
+                echo json_encode($response);
+            } else {
+                $_SESSION['update_profile_error'] = $error;
+                header("Location: ../../../html/company_profile.html");
+            }
+            exit();
+        }
+        $companies_fields_to_update[] = "bio = '$bio'";
+    }
+
+    if ($address !== null) {
+        // Update address
+        if (empty($address)) {
+            $error = "Address cannot be empty.";
+            if ($isAjax) {
+                http_response_code(400);
+                $response['error'] = $error;
+                echo json_encode($response);
+            } else {
+                $_SESSION['update_profile_error'] = $error;
+                header("Location: ../../../html/company_profile.html");
+            }
+            exit();
+        }
+        $companies_fields_to_update[] = "address = '$address'";
+    }
+
+    if (empty($users_fields_to_update) && empty($companies_fields_to_update)) {
         // No fields to update
         $error = "No data provided to update.";
         if ($isAjax) {
@@ -116,36 +133,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // Prepare the SQL statement
-    $query = "UPDATE users SET " . implode(", ", $fields_to_update) . " WHERE user_id = ?";
-    $types .= "i"; // For user_id
-    $params[] = $_SESSION['user_id'];
-
-    if ($stmt = $conn->prepare($query)) {
-        // Bind parameters dynamically
-        $stmt->bind_param($types, ...$params);
-        if ($stmt->execute()) {
-            // Update session variables
-            if ($name !== null) {
-                $_SESSION['name'] = $name;
-            }
-            if ($email !== null) {
-                $_SESSION['email'] = $email;
-            }
-
-            $success = "Profile updated successfully.";
-            $stmt->close();
-            $conn->close();
-            if ($isAjax) {
-                echo json_encode(['success' => $success]);
-            } else {
-                $_SESSION['update_profile_success'] = $success;
-                header("Location: ../../../html/company_profile.html");
-            }
-            exit();
-        } else {
-            $error = "Failed to update profile: " . $stmt->error;
-            $stmt->close();
+    // Construct the query for the users table if needed
+    if (!empty($users_fields_to_update)) {
+        $query = "UPDATE users SET " . implode(", ", $users_fields_to_update) . " WHERE user_id = " . $_SESSION['user_id'];
+        
+        if ($conn->query($query) === FALSE) {
+            $error = "Failed to update profile in users table: " . $conn->error;
             $conn->close();
             if ($isAjax) {
                 http_response_code(500); // Internal Server Error
@@ -156,18 +149,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         }
-    } else {
-        $error = "Database error: Unable to prepare statement.";
-        $conn->close();
-        if ($isAjax) {
-            http_response_code(500); // Internal Server Error
-            echo json_encode(['error' => $error]);
-        } else {
-            $_SESSION['update_profile_error'] = $error;
-            header("Location: ../../../html/company_profile.html");
-        }
-        exit();
     }
+
+    // Construct the query for the companies table if needed
+    if (!empty($companies_fields_to_update)) {
+        $query = "UPDATE companies SET " . implode(", ", $companies_fields_to_update) . " WHERE user_id = " . $_SESSION['user_id'];
+        
+        if ($conn->query($query) === FALSE) {
+            $error = "Failed to update profile in companies table: " . $conn->error;
+            $conn->close();
+            if ($isAjax) {
+                http_response_code(500); // Internal Server Error
+                echo json_encode(['error' => $error]);
+            } else {
+                $_SESSION['update_profile_error'] = $error;
+                header("Location: ../../../html/company_profile.html");
+            }
+            exit();
+        }
+    }
+
+    // If update is successful
+    $success = "Profile updated successfully.";
+    $conn->close();
+    if ($isAjax) {
+        echo json_encode(['success' => $success]);
+    } else {
+        $_SESSION['update_profile_success'] = $success;
+        header("Location: ../../../html/company_profile.html");
+    }
+    exit();
 } else {
     // Invalid request method
     $error = "Invalid request method.";
@@ -181,3 +192,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit();
 }
 ?>
+

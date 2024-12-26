@@ -18,11 +18,21 @@
 
         <div class="section">
             <h2>Profile Details</h2>
+            <img id="company-logo" alt="Company Logo" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; display: inline-block; margin-right: 10px; vertical-align: middle;">          
             <p><strong>Name:</strong> <span id="company-name">Loading...</span></p>
             <p><strong>Email:</strong> <span id="company-email">Loading...</span></p>
             <p><strong>Account Balance:</strong> $<span id="account-balance">Loading...</span></p>
+            <p><strong>Bio:</strong> <span id="company-bio">Loading...</span></p>
+            <p><strong>Address:</strong><span id="company-address">Loading...</span></p>
+            <p><strong>All Available Flights</strong></p>
+                <ul id="flight-list" class="flight-list">
+                    <li>Loading flights...</li>
+                </ul>
+            
+       
         </div>
 
+    
         <div class="section">
             <h2>Edit Name</h2>
             <form id="editNameForm">
@@ -42,10 +52,30 @@
                 <button type="submit" class="btn">Update Email</button>
             </form>
         </div>
+        <div class="section">
+            <h2>Edit Bio</h2>
+            <form id="editBioForm">
+                <label for="edit-bio">New Bio:</label>
+                <textarea id="edit-bio" name="bio" required></textarea>
+
+                <button type="submit" class="btn">Update Bio</button>
+            </form>
+        </div>
+        <div class="section">
+            <h2>Edit Address</h2>
+            <form id="editAddressForm">
+                <label for="edit-address">New Address:</label>
+                <input id="edit-address" name="address" required>
+
+                <button type="submit" class="btn">Update Address</button>
+            </form>
+        </div>
+        
         
     </div>
 
     <script src="../js/company_profile.js"></script>
+
 
 </body>
 </html>
