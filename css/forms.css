@@ -1,0 +1,85 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.container {
+    width: 60%;
+    margin: auto;
+    padding-top: 30px;
+}
+
+.errors {
+    color: red;
+    font-weight: bold;
+}
+
+.flight-details {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.flight-details h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.flight-details p {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.back-link {
+    margin-top: 20px;
+    display: inline-block;
+    text-decoration: none;
+    color: #2196F3;
+    font-weight: bold;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+    color: #1976D2;
+}
+
+button {
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1976D2;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}

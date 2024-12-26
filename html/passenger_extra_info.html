@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passenger Information</title>
+    <link rel="stylesheet" href="../css/forms.css">
+</head>
+<body>
+    <h1>Passenger Information</h1>
+    <form method="POST" action="../php/user/passenger_extra_info.php?email=test@passenger.com" enctype="multipart/form-data">
+        <label for="photo">Upload Photo:</label>
+        <input type="file" id="photo" name="photo" required>
+
+        <label for="passport">Upload Passport Image:</label>
+        <input type="file" id="passport" name="passport" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

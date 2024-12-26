@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Information</title>
+    <link rel="stylesheet" href="../css/forms.css">
+</head>
+<body>
+    <h1>Company Information</h1>
+    <form method="POST" action="../php/company/company_extra_info.php">
+        <label for="bio">Bio:</label>
+        <textarea id="bio" name="bio" required></textarea>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="location">Location (Optional):</label>
+        <input type="text" id="location" name="location">
+
+        <label for="logo">Upload Logo:</label>
+        <input type="file" id="logo" name="logo" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
