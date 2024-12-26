@@ -1,8 +1,14 @@
 body {
     font-family: Arial, sans-serif;
+    font-size: large;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background: linear-gradient(-45deg, #d0eff5, #dfeff5, #d0eef7);    
+}
+.container h2{
+    font-size: 40px;
+    font-family: Cambria, Cochin, 'Georgia', Times, Times New Roman, serif;
+    color: #020337;
 }
 
 .container {
@@ -11,26 +17,26 @@ body {
     padding-top: 30px;
 }
 
-.errors {
-    color: red;
-}
-
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate; /* Change to separate to add spacing between rows */
+    border-spacing: 0 10px; /* Add spacing between rows */
     margin-top: 20px;
+    
 }
 
-table,
-th,
-td {
-    border: 1px solid #ddd;
-}
 
-th,
-td {
+
+th, td {
     padding: 12px;
     text-align: left;
+}
+
+tr {
+    background-color: #fff; /* Ensure background is white */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for separation */
+    height: 70px;
+    margin-bottom: 10px;
 }
 
 tr:hover {
@@ -38,7 +44,7 @@ tr:hover {
 }
 
 th {
-    background-color: #4CAF50;
+    background-color: #020337;
     color: white;
 }
 
@@ -46,7 +52,7 @@ th {
     margin-top: 20px;
     display: inline-block;
     text-decoration: none;
-    color: #2196F3;
+    color: #031829;
 }
 
 .status-registered {

@@ -73,47 +73,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>My Bookings</title>
-    <style>
-        .container {
-            width: 90%;
-            margin: auto;
-            padding-top: 30px;
-        }
-        .errors {
-            color: red;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-        }
-        tr:hover {background-color: #f5f5f5;}
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .back-link {
-            margin-top: 20px;
-            display: inline-block;
-            text-decoration: none;
-            color: #2196F3;
-        }
-        .status-registered {
-            color: green;
-            font-weight: bold;
-        }
-        .status-pending {
-            color: orange;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="../../../css/mybookings.css">
 </head>
 <body>
     <div class="container">
