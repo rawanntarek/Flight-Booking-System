@@ -157,6 +157,56 @@
                 showError('Error updating email.');
             });
         });
+
+
+// Handle Edit Logo Form Submission
+document.getElementById('editLogoForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const fileInput = document.getElementById('edit-logo');
+    if (!fileInput.files || fileInput.files.length === 0) {
+        showError('Please select an image file.');
+        return;
+    }
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('logo', fileInput.files[0]); // The actual file object
+
+    // IMPORTANT: double-check the path below!
+    fetch('../php/controllers/company/update_company_logo.php', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        // If the server returns a 404 or other error, handle it:
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json(); 
+    })
+    .then(data => {
+        if (data.success) {
+            showFeedback(data.success);
+            // Refresh the displayed logo
+            fetchCompanyLogo();
+        } else if (data.error) {
+            showError(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating logo:', error);
+        showError('Error updating logo.');
+    });
+});
+
+
+
+
  // Handle Edit Email Form Submission
         document.getElementById('editBioForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent default form submission
