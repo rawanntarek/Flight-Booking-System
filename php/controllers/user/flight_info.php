@@ -58,16 +58,13 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>Flight Information</title>
-    <!-- Link to the combined CSS -->
     <link rel="stylesheet" href="../../../css/userFlightDetails.css"> <!-- Ensure this path is correct -->
-    <!-- Google Fonts (If using Open Sans) -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-</head>
+   </head>
 <body>
-    <div class="limiter">
-        <div class="container-table100">
-            <div class="wrap-table100">
-                <div class="table100">
+    <div>
+        <div >
+            <div >
+                <div>
                     <div class="container">
                         <h2>Flight Information</h2>
 
