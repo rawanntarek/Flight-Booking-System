@@ -9,31 +9,46 @@
 <body>
     <!-- Form that submits to register.php -->
     <form method="POST" action="../php/controllers/user/register.php">
-                <text>
-            Create an account
-        </text>
+        <h2>Create an Account</h2>
         <br>
-        <label>Email:</label>
-        <input type="email" id="email" required>
-        <br>
-        <label>Name:</label>
-        <input type="text" id="name" required>
-        <br>
-        <label>Password:
-        </label>
-        <input type="password" id="password" required>
-        <br>
-        <label>Telephone:</label>
-        <input type="tel" id="telephone" required>
-        <br>
-        <label>Type:</label>
-        <select required>
-            <option id="company">Company</option>
-            <option id="passenger">Passenger</option>
-        </select>
-        <input type="submit" value="submit">
-        <br>
-        <text style="font-size:15px ; text-align: center;">already have an account? <a href="Login.html">login</a></text>
         
+        <!-- Email Field -->
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        
+        <!-- Name Field -->
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        
+        <!-- Password Field -->
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        
+        <!-- Telephone Field -->
+        <label for="telephone">Telephone:</label>
+        <input type="tel" id="telephone" name="telephone" required>
+        <br>
+        
+        <!-- User Type Selection -->
+        <label for="user_type">Type:</label>
+        <select id="user_type" name="user_type" required>
+            <option value="">--Select Type--</option>
+            <option value="Company">Company</option>
+            <option value="Passenger">Passenger</option>
+        </select>
+        <br><br>
+        
+        <!-- Submit Button -->
+        <input type="submit" value="Register">
+        <br><br>
+        
+        <!-- Link to Login Page -->
+        <p style="font-size:15px; text-align: center;">
+            Already have an account? <a href="Login.html">Login</a>
+        </p>
+    </form>
 </body>
 </html>

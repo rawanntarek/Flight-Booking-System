@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>Company Information</h1>
-    <form method="POST" action="../php/company/company_extra_info.php">
+    <form method="POST" action="../php/controllers/company/company_extra_info.php" enctype="multipart/form-data">
         <label for="bio">Bio:</label>
         <textarea id="bio" name="bio" required></textarea>
 
@@ -19,7 +19,7 @@
         <input type="text" id="location" name="location">
 
         <label for="logo">Upload Logo:</label>
-        <input type="file" id="logo" name="logo" required>
+        <input type="file" id="logo" name="logo" accept="image/*" required>
 
         <button type="submit">Submit</button>
     </form>

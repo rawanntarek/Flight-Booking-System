@@ -1,5 +1,5 @@
 <?php
-// Start the session (optional, if you plan to use sessions)
+// Start the session
 session_start();
 
 // Include the database configuration file
@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $telephone = sanitize_input($_POST['telephone']);
     $user_type = sanitize_input($_POST['user_type']);
 
-    // Basic validation (you can add more as needed)
+    // Basic validation
     if (empty($email) || empty($name) || empty($password) || empty($telephone) || empty($user_type)) {
         die("Please fill in all required fields.");
     }
@@ -63,11 +63,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("sssss", $name, $email, $hashed_password, $telephone, $user_type);
         
         if ($stmt->execute()) {
-            // Registration successful, redirect to login.html
+            // Get the inserted user_id
+            $user_id = $stmt->insert_id;
+
+            // Store user_id and user_type in session
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['user_type'] = $user_type;
+
+            // Close the statement and connection
             $stmt->close();
             $conn->close();
-            header("Location: ../../../html/Login.html");
-            exit();
+
+            // Redirect based on user_type
+            if ($user_type === 'Company') {
+                header("Location: ../../../html/company_extra_info.html");
+                exit();
+            } else {
+                header("Location: ../../../html/passenger_extra_info.html");
+                exit();
+            }
         } else {
             // Insertion failed
             $stmt->close();

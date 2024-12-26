@@ -8,12 +8,12 @@
 </head>
 <body>
     <h1>Passenger Information</h1>
-    <form method="POST" action="../php/user/passenger_extra_info.php?email=test@passenger.com" enctype="multipart/form-data">
+    <form method="POST" action="../php/controllers/user/passenger_extra_info.php" enctype="multipart/form-data">
         <label for="photo">Upload Photo:</label>
-        <input type="file" id="photo" name="photo" required>
+        <input type="file" id="photo" name="photo" accept="image/*" required>
 
         <label for="passport">Upload Passport Image:</label>
-        <input type="file" id="passport" name="passport" required>
+        <input type="file" id="passport" name="passport" accept="image/*" required>
 
         <button type="submit">Submit</button>
     </form>
