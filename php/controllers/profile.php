@@ -130,36 +130,8 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
-    <link rel="stylesheet" href="../../css/Registration.css"> <!-- Reusing Registration.css for styling -->
-    <style>
-        /* Additional styling can be added here */
-        .container {
-            width: 50%;
-            margin: auto;
-            padding-top: 50px;
-        }
-        .message {
-            color: green;
-        }
-        .errors {
-            color: red;
-        }
-        label {
-            display: inline-block;
-            width: 150px;
-            margin-top: 10px;
-        }
-        input, select {
-            width: 60%;
-            padding: 8px;
-            margin-top: 10px;
-        }
-        input[type="submit"] {
-            width: auto;
-            padding: 10px 20px;
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="../../css/UserProfile.css"> <!-- Reusing Registration.css for styling -->
+    
 </head>
 <body>
     <div class="container">
@@ -182,30 +154,37 @@ $conn->close();
         <?php endif; ?>
 
         <form method="POST" action="">
+        <div class="section">
             <label for="name">Name:</label>
             <input type="text" name="name" id="name" value="<?php echo htmlspecialchars($name); ?>" required><br>
-
+        </div>
+            <div class="section">
             <label for="email">Email:</label>
             <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($email); ?>" required><br>
-
+            </div>
+            <div class="section">
             <label for="telephone">Telephone:</label>
             <input type="text" name="telephone" id="telephone" value="<?php echo htmlspecialchars($telephone); ?>"><br>
-
+            </div>
+            <div class="section">
             <label for="user_type">User Type:</label>
             <select name="user_type" id="user_type" required>
                 <option value="">Select</option>
                 <option value="Company" <?php if ($user_type == 'Company') echo 'selected'; ?>>Company</option>
                 <option value="Passenger" <?php if ($user_type == 'Passenger') echo 'selected'; ?>>Passenger</option>
             </select><br>
+            </div>
+            <div class="section">
 
             <label for="password">New Password:</label>
             <input type="password" name="password" id="password"><br>
-
+            </div>
+            <div class="section">
             <label for="confirm_password">Confirm Password:</label>
             <input type="password" name="confirm_password" id="confirm_password"><br>
-
-            <input type="submit" value="Update Profile">
-        </form>
+            </div>
+            <button type="submit" class="btn">Update Profile</button>
+            </form>
 
         <br>
         <a href="../../html/dashboard.html">Back to Dashboard</a>
