@@ -13,28 +13,27 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'Company') {
 // Include the database configuration file
 require_once '../config/db_config.php';
 
-// Function to sanitize user input
+// Helper to sanitize input
 function sanitize_input($data) {
     return htmlspecialchars(stripslashes(trim($data)));
 }
 
-// Determine if the request is AJAX
+// Check if this is an AJAX POST request
 $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
-// Initialize response array
+// Return array
 $response = [];
 
-// Handle POST request
+// Handle POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve and sanitize flight_id
+    // Retrieve flight_id
     $flight_id = isset($_POST['flight_id']) ? intval($_POST['flight_id']) : 0;
 
     if ($flight_id <= 0) {
         $error = "Invalid flight ID.";
         if ($isAjax) {
             http_response_code(400); // Bad Request
-            $response['error'] = $error;
-            echo json_encode($response);
+            echo json_encode(['error' => $error]);
         } else {
             $_SESSION['cancel_flight_error'] = $error;
             header("Location: ../../html/company_home.html");
@@ -42,110 +41,117 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // Begin transaction
+    // Start transaction
     $conn->begin_transaction();
 
     try {
-        // Verify that the flight belongs to the company
-        $verify_query = "SELECT flight_id FROM flights WHERE flight_id = ? AND company_id = ?";
-        if ($verify_stmt = $conn->prepare($verify_query)) {
-            $company_id = $_SESSION['user_id'];
-            $verify_stmt->bind_param("ii", $flight_id, $company_id);
-            $verify_stmt->execute();
-            $verify_stmt->store_result();
-            if ($verify_stmt->num_rows !== 1) {
-                throw new Exception("Flight not found or does not belong to your company.");
-            }
-            $verify_stmt->close();
-        } else {
-            throw new Exception("Database error: Unable to prepare statement.");
+        // 1) Verify that the flight belongs to this company
+        $company_id = $_SESSION['user_id'];
+        $verify_sql = "SELECT flight_id 
+                       FROM flights 
+                       WHERE flight_id = ? 
+                         AND company_id = ?";
+        $verify_stmt = $conn->prepare($verify_sql);
+        if (!$verify_stmt) {
+            throw new Exception("Database error (verify_stmt): " . $conn->error);
         }
-
-        // Fetch all registered passengers for the flight
-        $passengers_query = "SELECT passengers.passenger_id, passengers.name, passengers.email, flight_passengers.fee_paid FROM passengers JOIN flight_passengers ON passengers.passenger_id = flight_passengers.passenger_id WHERE flight_passengers.flight_id = ? AND flight_passengers.status = 'Registered'";
-        if ($passengers_stmt = $conn->prepare($passengers_query)) {
-            $passengers_stmt->bind_param("i", $flight_id);
-            $passengers_stmt->execute();
-            $passengers_result = $passengers_stmt->get_result();
-            $passengers = [];
-            while ($row = $passengers_result->fetch_assoc()) {
-                $passengers[] = $row;
-            }
-            $passengers_stmt->close();
-        } else {
-            throw new Exception("Database error: Unable to prepare passengers statement.");
+        $verify_stmt->bind_param("ii", $flight_id, $company_id);
+        $verify_stmt->execute();
+        $verify_stmt->store_result();
+        if ($verify_stmt->num_rows !== 1) {
+            throw new Exception("Flight not found or does not belong to your company.");
         }
+        $verify_stmt->close();
 
-        // Refund each passenger's fee
+        // 2) Fetch all registered passengers (with flight fee)
+        //    We'll join flight_passengers -> users -> flights (to get fees).
+        $passengers_sql = "
+            SELECT u.user_id, u.name, u.email, f.fees
+            FROM flight_passengers fp
+            JOIN users u ON fp.user_id = u.user_id
+            JOIN flights f ON fp.flight_id = f.flight_id
+            WHERE fp.flight_id = ?
+              AND fp.status = 'Registered'
+        ";
+        $passengers_stmt = $conn->prepare($passengers_sql);
+        if (!$passengers_stmt) {
+            throw new Exception("Database error (passengers_stmt): " . $conn->error);
+        }
+        $passengers_stmt->bind_param("i", $flight_id);
+        $passengers_stmt->execute();
+        $result = $passengers_stmt->get_result();
+
+        // Build an array of passengers to refund
+        $passengers = [];
+        while ($row = $result->fetch_assoc()) {
+            $passengers[] = $row; 
+        }
+        $passengers_stmt->close();
+
+        // 3) Refund each passenger
+        //    Add flight.fees back to their users.account_balance
         foreach ($passengers as $passenger) {
-            $refund_query = "UPDATE users SET account_balance = account_balance + ? WHERE user_id = ?";
-            if ($refund_stmt = $conn->prepare($refund_query)) {
-                $fee = $passenger['fee_paid'];
-                $passenger_id = $passenger['passenger_id'];
-                $refund_stmt->bind_param("di", $fee, $passenger_id);
-                if (!$refund_stmt->execute()) {
-                    throw new Exception("Failed to refund passenger ID: " . $passenger_id);
-                }
-                $refund_stmt->close();
-            } else {
-                throw new Exception("Database error: Unable to prepare refund statement.");
+            $refund_sql = "UPDATE users 
+                           SET account_balance = account_balance + ? 
+                           WHERE user_id = ?";
+            $refund_stmt = $conn->prepare($refund_sql);
+            if (!$refund_stmt) {
+                throw new Exception("Database error (refund_stmt): " . $conn->error);
             }
+            $fee     = $passenger['fees'];
+            $user_id = $passenger['user_id']; // from the 'users' table
+            $refund_stmt->bind_param("di", $fee, $user_id);
+            if (!$refund_stmt->execute()) {
+                throw new Exception("Failed to refund user_id={$user_id}: " . $refund_stmt->error);
+            }
+            $refund_stmt->close();
         }
 
-        // Update flight status to cancelled
-        $cancel_query = "UPDATE flights SET status = 'Cancelled' WHERE flight_id = ?";
-        if ($cancel_stmt = $conn->prepare($cancel_query)) {
-            $cancel_stmt->bind_param("i", $flight_id);
-            if (!$cancel_stmt->execute()) {
-                throw new Exception("Failed to cancel the flight.");
-            }
-            $cancel_stmt->close();
-        } else {
-            throw new Exception("Database error: Unable to prepare cancel flight statement.");
+        // 4) Optionally mark flight as "Cancelled"
+        //    If you have a `status` column or you can set `completed = 1`.
+        //    We'll assume you have a `status` column for "Cancelled"
+        $cancel_sql = "UPDATE flights 
+                       SET status = 'Cancelled' 
+                       WHERE flight_id = ?";
+        $cancel_stmt = $conn->prepare($cancel_sql);
+        if (!$cancel_stmt) {
+            throw new Exception("Database error (cancel_stmt): " . $conn->error);
         }
+        $cancel_stmt->bind_param("i", $flight_id);
+        if (!$cancel_stmt->execute()) {
+            throw new Exception("Failed to cancel the flight: " . $cancel_stmt->error);
+        }
+        $cancel_stmt->close();
 
-        // Commit transaction
+        // 5) Commit the transaction
         $conn->commit();
 
-        // Send emails to passengers (optional; requires mail server configuration)
-        /*
-        foreach ($passengers as $passenger) {
-            $to = $passenger['email'];
-            $subject = "Flight Cancellation Notice";
-            $message = "Dear " . $passenger['name'] . ",\n\nWe regret to inform you that the flight \"" . $flight['name'] . "\" has been cancelled. Your fee of $" . $passenger['fee_paid'] . " has been refunded to your account.\n\nBest regards,\nTrain Booking System";
-            $headers = "From: no-reply@trainbookingsystem.com";
+        // Optionally send emails to each refunded passenger (omitted here)
 
-            mail($to, $subject, $message, $headers);
-        }
-        */
-
+        // Return success
         $response['success'] = "Flight cancelled and passengers refunded successfully.";
+        if ($isAjax) {
+            echo json_encode($response);
+        } else {
+            $_SESSION['cancel_flight_success'] = $response['success'];
+            header("Location: ../../html/company_home.html");
+        }
+        exit();
+
     } catch (Exception $e) {
+        // Something went wrong, rollback
         $conn->rollback();
         $error = $e->getMessage();
         if ($isAjax) {
             http_response_code(500); // Internal Server Error
-            $response['error'] = $error;
+            echo json_encode(['error' => $error]);
         } else {
             $_SESSION['cancel_flight_error'] = $error;
             header("Location: ../../html/company_home.html");
         }
-        echo json_encode($response);
         exit();
     }
 
-    // Close the database connection
-    $conn->close();
-
-    // Send success response
-    if ($isAjax) {
-        echo json_encode($response);
-    } else {
-        $_SESSION['cancel_flight_success'] = $response['success'];
-        header("Location: ../../html/company_home.html");
-    }
-
-    exit();
 } else {
     // Invalid request method
     $error = "Invalid request method.";
@@ -158,4 +164,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     exit();
 }
-?>
