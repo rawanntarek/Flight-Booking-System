@@ -73,7 +73,6 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>My Bookings</title>
-    <link rel="stylesheet" href="../../../css/Registration.css"> <!-- Reusing Registration.css for styling -->
     <style>
         .container {
             width: 90%;
