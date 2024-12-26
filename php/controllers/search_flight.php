@@ -123,50 +123,8 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>Search Results</title>
-    <link rel="stylesheet" href="../../css/Registration.css">
-    <style>
-        .container {
-            width: 80%;
-            margin: auto;
-            padding-top: 30px;
-        }
-        .errors {
-            color: red;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-        }
-        tr:hover {background-color: #f5f5f5;}
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        a.button {
-            padding: 8px 12px;
-            background-color: #2196F3;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        a.button:hover {
-            background-color: #0b7dda;
-        }
-        .back-link {
-            margin-top: 20px;
-            display: inline-block;
-            text-decoration: none;
-            color: #2196F3;
-        }
-    </style>
+    <link rel="stylesheet" href="../../css/searchflight.css">
+    
 </head>
 <body>
     <div class="container">
