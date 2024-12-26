@@ -40,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             f.fees, 
             f.start_time, 
             f.end_time,
+            f.status,          
             f.capacity,
             (f.capacity - COUNT(fp.user_id)) AS remaining_seats
         FROM 
@@ -150,6 +151,7 @@ $conn->close();
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th>Remaining Seats</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -163,7 +165,14 @@ $conn->close();
                             <td><?php echo htmlspecialchars($flight['end_time']); ?></td>
                             <td><?php echo htmlspecialchars($flight['remaining_seats']); ?></td>
                             <td>
-                                <a class="button" href="flight_info.php?flight_id=<?php echo urlencode($flight['flight_id']); ?>">View Details</a>
+                                <?php echo htmlspecialchars($flight['status']); ?>
+                            </td>
+                            <td>
+                                <?php if ($flight['status'] === 'Cancelled') : ?>
+                                    <span style="color: red;">Cannot Book (Cancelled)</span>
+                                <?php else: ?>
+                                    <a class="button" href="flight_info.php?flight_id=<?php echo urlencode($flight['flight_id']); ?>">View Details</a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
