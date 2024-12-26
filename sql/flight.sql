@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 10, 2024 at 10:58 PM
+-- Generation Time: Dec 26, 2024 at 05:30 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -20,6 +20,27 @@ SET time_zone = "+00:00";
 --
 -- Database: `flight`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `companies`
+--
+
+CREATE TABLE `companies` (
+  `user_id` int(11) NOT NULL,
+  `bio` text NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `logo_path` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `companies`
+--
+
+INSERT INTO `companies` (`user_id`, `bio`, `address`, `location`, `logo_path`) VALUES
+(18, 'c@gmail.com', 'c@gmail.com', 'c@gmail.com', '../../uploads/logos/18_logo.png');
 
 -- --------------------------------------------------------
 
@@ -111,6 +132,25 @@ INSERT INTO `messages` (`message_id`, `sender_id`, `receiver_id`, `message_conte
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `passengers`
+--
+
+CREATE TABLE `passengers` (
+  `user_id` int(11) NOT NULL,
+  `photo_path` varchar(255) NOT NULL,
+  `passport_path` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `passengers`
+--
+
+INSERT INTO `passengers` (`user_id`, `photo_path`, `passport_path`) VALUES
+(17, '../../uploads/passengers/photos/17_photo.png', '../../uploads/passengers/passports/17_passport.png');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -140,11 +180,21 @@ INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `telephone`, `user_
 (11, 'test8@gmail.com', 'test8@gmail.com', '$2y$10$3K7n8YBVzi/uUmrF9pEIqOcLONO8rveS01Qb/Q5mCeVET4EgRy8rK', 'test8@gmail.com', 'Passenger', 999849.00),
 (12, 'company@gmail.com', 'company@gmail.com', '$2y$10$9ZmMhodRhD5Ozw5i0969c.n5N47xqfyrtrBxLgyiYlgMMc5ymdtXm', 'company@gmail.com', 'Company', 50000.00),
 (13, 'user2@gmail.com', 'user2@gmail.com', '$2y$10$LYHTjhW9OHhHkPdPUyByueHqQa4NjEBlRhdp2Iyn4Nnasr2RMfFcW', '1234', 'Passenger', 499308.00),
-(14, 'yehiashaikhoun20302@gmail.com', 'yehiashaikhoun20032@gmail.com', '$2y$10$gQFN2ZtmGyfH5XoEgm1UI.yv6dpQbDH5dmZz.09WkPm5Uw24.ODra', 'yehiashaikhoun2002@g', 'Passenger', 0.00);
+(14, 'yehiashaikhoun20302@gmail.com', 'yehiashaikhoun20032@gmail.com', '$2y$10$gQFN2ZtmGyfH5XoEgm1UI.yv6dpQbDH5dmZz.09WkPm5Uw24.ODra', 'yehiashaikhoun2002@g', 'Passenger', 0.00),
+(15, 'roaa@gmail.com', 'roaa@gmail.com', '$2y$10$feqh9kxJmj.Vh86w3FTwNOoX.BoiDO.iPVPub3MEA4EzD2tdON2Pe', 'roaa@gmail.com', 'Passenger', 0.00),
+(16, 'roaaC@gmail.com', 'roaaC@gmail.com', '$2y$10$rtgFTdnDAYjlIVgHfQByouvbUTMO8NUdzaSysBk6m7PQdn85HPy4.', 'roaaC@gmail.com', 'Company', 0.00),
+(17, 'newuser@gmail.com', 'newuser@gmail.com', '$2y$10$rRBi9BStQ.UlBI720yf7dOpCgM9xj2eo1Zs5WUwCc6RPL3LnINzn.', 'newuser@gmail.com', 'Passenger', 0.00),
+(18, 'c@gmail.com', 'c@gmail.com', '$2y$10$m0SiOloe3S0vrQHS8dT67eR5xtddmPuIVTWkE0qYJbE1/QD7JkmYW', 'c@gmail.com', 'Company', 0.00);
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `companies`
+--
+ALTER TABLE `companies`
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- Indexes for table `flights`
@@ -166,6 +216,12 @@ ALTER TABLE `messages`
   ADD PRIMARY KEY (`message_id`),
   ADD KEY `sender_id` (`sender_id`),
   ADD KEY `receiver_id` (`receiver_id`);
+
+--
+-- Indexes for table `passengers`
+--
+ALTER TABLE `passengers`
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- Indexes for table `users`
@@ -194,11 +250,17 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `companies`
+--
+ALTER TABLE `companies`
+  ADD CONSTRAINT `companies_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `flight_passengers`
@@ -213,6 +275,12 @@ ALTER TABLE `flight_passengers`
 ALTER TABLE `messages`
   ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `passengers`
+--
+ALTER TABLE `passengers`
+  ADD CONSTRAINT `passengers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
