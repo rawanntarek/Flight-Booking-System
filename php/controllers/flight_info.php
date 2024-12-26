@@ -58,67 +58,8 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <title>Flight Information</title>
-    <link rel="stylesheet" href="../../css/Registration.css"> <!-- Reusing Registration.css for styling -->
-    <style>
-        .container {
-            width: 60%;
-            margin: auto;
-            padding-top: 30px;
-        }
-        .errors {
-            color: red;
-        }
-        .success {
-            color: green;
-        }
-        .flight-details {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .flight-details h3 {
-            margin-top: 0;
-        }
-        .flight-details p {
-            margin: 10px 0;
-        }
-        .back-link {
-            margin-top: 20px;
-            display: inline-block;
-            text-decoration: none;
-            color: #2196F3;
-        }
-        .book-section {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #e9f5ff;
-        }
-        .book-section h3 {
-            margin-top: 0;
-        }
-        .book-section label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .book-section select, .book-section input[type="submit"] {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
-        .book-section input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .book-section input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <link rel="stylesheet" href="../../css/flight_info.css"> <!-- Reusing Registration.css for styling -->
+   
 </head>
 <body>
 <link rel="stylesheet" href="../../css/userFlightDetails.css"> <!-- Ensure this path is correct -->
