@@ -136,26 +136,7 @@ $conn->close();
                                 </table>
                             </div>
 
-                            <!-- Booking Section -->
-                            <div class="book-section">
-                                <h3>Book This Flight</h3>
-                                <form method="POST" action="../controllers/user/book_flight.php">
-                                    <input type="hidden" name="flight_id" value="<?php echo htmlspecialchars($flight['flight_id']); ?>">
-
-                                    <?php if ($_SESSION['user_type'] === 'Passenger'): ?>
-    <label for="payment_method">Payment Method:</label>
-    <select name="payment_method" id="payment_method" required>
-        <option value="" disabled selected>Select Payment Method</option>
-        <option value="balance">Pay from Account Balance</option>
-        <option value="cash">Pay Cash</option>
-    </select>
-<?php elseif ($_SESSION['user_type'] === 'Company'): ?>
-<?php endif; ?>
-
-
-                                    <input type="submit" value="Book Flight">
-                                </form>
-                            </div>
+                            
                         <?php endif; ?>
 
                         <!-- Back to Search Results Link -->
