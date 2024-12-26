@@ -42,6 +42,7 @@ function fetchFlightDetails() {
             document.getElementById('flight-name').textContent = data.flight.name;
             document.getElementById('flight-itinerary').textContent = data.flight.itinerary;
             document.getElementById('flight-time').textContent = data.flight.flight_time;
+            document.getElementById('flight-status').textContent = data.flight.flight_time;
 
             // Populate Pending Passengers
             const pendingList = document.getElementById('pending-passengers');
