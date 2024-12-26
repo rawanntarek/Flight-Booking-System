@@ -59,7 +59,7 @@ $conn->close();
     <meta charset="UTF-8">
     <title>Flight Information</title>
     <!-- Link to the combined CSS -->
-    <link rel="stylesheet" href="../../../css/styles.css"> <!-- Ensure this path is correct -->
+    <link rel="stylesheet" href="../../../css/userFlightDetails.css"> <!-- Ensure this path is correct -->
     <!-- Google Fonts (If using Open Sans) -->
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
 </head>
