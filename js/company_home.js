@@ -69,16 +69,31 @@ function fetchFlights() {
     .then(response => response.json())
     .then(data => {
         const flightList = document.getElementById('flight-list');
-        flightList.innerHTML = ''; // Clear existing list
+        flightList.innerHTML = ''; // Clear existing
 
         if (data.flights && data.flights.length > 0) {
             data.flights.forEach(flight => {
-                const li = document.createElement('li');
-                // Display flight name and ID
-                li.textContent = `${flight.name} (ID: ${flight.flight_id})`;
+                
+                // If you have "status" directly:
+                const flightStatus = flight.status || 'Unknown';
 
-                // Make <li> clickable
-                li.onclick = () => openFlightDetails(flight.flight_id);
+                // If you only have "completed" (0 or 1), do e.g.:
+                // const flightStatus = (flight.completed === 1) ? 'Completed' : 'Active';
+
+                // Create the list item
+                const li = document.createElement('li');
+                // Show name, ID, and status
+                li.innerHTML = `
+                    <strong>${flight.name}</strong> 
+                    (ID: ${flight.flight_id}) 
+                    - Status: ${flightStatus}
+                `;
+
+                // Make it clickable to see flight details
+                li.onclick = () => {
+                    // Navigate to flight_details.html with a query param
+                    window.location.href = `flight_details.html?flight_id=${flight.flight_id}`;
+                };
 
                 flightList.appendChild(li);
             });
@@ -92,6 +107,8 @@ function fetchFlights() {
         flightList.innerHTML = '<li>Error fetching flights.</li>';
     });
 }
+
+
 
 // This function is called when a user clicks on a flight <li>
 function openFlightDetails(flight_id) {

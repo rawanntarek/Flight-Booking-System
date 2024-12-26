@@ -121,6 +121,8 @@ $conn->close();
     </style>
 </head>
 <body>
+<link rel="stylesheet" href="../../css/userFlightDetails.css"> <!-- Ensure this path is correct -->
+
     <div class="container">
         <h2>Flight Information</h2>
 

@@ -28,7 +28,10 @@ if ($flight_id <= 0) {
 }
 
 // Prepare SQL statement to fetch flight details
-$query = "SELECT flight_id, name, from_location, to_location, flight_time FROM flights WHERE flight_id = ? AND company_id = ?";
+$query = "SELECT flight_id, name, from_location, to_location, flight_time, status
+          FROM flights
+          WHERE flight_id = ?
+            AND company_id = ?";
 
 if ($stmt = $conn->prepare($query)) {
     $company_id = $_SESSION['user_id'];
@@ -76,7 +79,8 @@ if ($stmt = $conn->prepare($query)) {
                 'name' => $flight['name'],
                 'from_location' => $flight['from_location'],
                 'to_location' => $flight['to_location'],
-                'flight_time' => $flight['flight_time']
+                'flight_time' => $flight['flight_time'],
+                'status'        => $flight['status'] 
             ],
             'pending_passengers' => $pending_passengers,
             'registered_passengers' => $registered_passengers

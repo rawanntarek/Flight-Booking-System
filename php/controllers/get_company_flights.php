@@ -10,11 +10,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'Company') {
     exit();
 }
 
-// Include the database configuration file
 require_once '../config/db_config.php';
 
-// Prepare SQL statement to fetch all active flights for the company
-$query = "SELECT flight_id, name FROM flights WHERE company_id = ? AND completed = 0";
+// Suppose we store flight status in a "status" column: 'Active','Cancelled','Completed'
+$query = "SELECT flight_id, name, status 
+          FROM flights 
+          WHERE company_id = ?";
 
 if ($stmt = $conn->prepare($query)) {
     $company_id = $_SESSION['user_id'];
