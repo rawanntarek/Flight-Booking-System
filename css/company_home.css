@@ -163,3 +163,126 @@ button:hover {
         margin-bottom: 10px;
     }
 
+
+
+
+    /*****************************************************
+ * Chat Section Styles
+ *****************************************************/
+.chatSection {
+    /* Hidden by default; you can toggle .chatSection { display: block; } in JS */
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 800px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    z-index: 9999;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.chatHeader {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.chatContainer {
+    display: flex;
+    gap: 1rem; /* optional spacing between the sidebar and messages */
+}
+
+/* Left sidebar: contacts list */
+.chatSidebar {
+    width: 30%;
+    border-right: 1px solid #ccc;
+    padding: 10px;
+    max-height: 400px;      /* control the max height if you want a scrollable area */
+    overflow-y: auto;
+}
+
+.chatSidebar h4 {
+    margin-top: 0;
+}
+
+.chatSidebar ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.chatSidebar li {
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.chatSidebar li:hover {
+    background-color: #f0f0f0;
+}
+
+/* Right side: conversation & message input */
+.chatMessages {
+    flex-grow: 1; /* automatically fill remaining space */
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.chatMessages h4 {
+    margin-top: 0;
+}
+
+/* The window showing the conversation messages */
+.conversationWindow {
+    height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-bottom: 10px;
+    flex-grow: 1; 
+}
+
+/* Each message paragraph, optionally styled */
+.conversationWindow p {
+    margin: 5px 0;
+    word-wrap: break-word;  /* helps with very long words or links */
+}
+
+/* The area for typing and sending a new message */
+.messageInput {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.messageInput textarea {
+    width: 100%;
+    resize: none; /* optional: disable manual resizing of textarea */
+}
+
+.closeChatButton {
+    margin-top: 10px;
+    display: block;
+    margin: 0 auto;
+    cursor: pointer;
+}
+
+/* Optionally style the Send button in .messageInput */
+.messageInput button {
+    align-self: flex-end; /* moves the button to the right if you want */
+    cursor: pointer;
+}
+
+/* Example animation if you want a fade in for the chat overlay */
+.chatSection.show {
+    animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

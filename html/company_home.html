@@ -8,7 +8,12 @@
 </head>
 <body>
     <nav>
-        <center><a href="company_profile.html" >View-Edit Profile</a></center>
+        <center>
+            <a href="company_profile.html" >View-Edit Profile</a>
+            <a href="#" onclick="openChatSection()">Chat</a>
+
+        </center>
+
     </nav>
     <div class="container">
         <div id="feedback" class="feedback"></div>
@@ -21,11 +26,13 @@
             <p id="company-name">Loading...</p>
         </div>
 
+        <!--  Add Flight Section  -->
         <div class="section">
             <h2>Add Flight</h2>
             <button onclick="window.location.href='add_flight.html'">Add New Flight</button>
         </div>
 
+        <!--  All Flights Section  -->
         <div class="section">
             <h2>All Available Flights</h2>
             <ul id="flight-list" class="flight-list">
@@ -33,6 +40,7 @@
             </ul>
         </div>
 
+        <!--  Unreplied Messages Section  -->
         <div class="section">
             <h2>Messages from Passengers</h2>
             <ul id="message-list" class="message-list">
@@ -43,11 +51,42 @@
      
     </div>
 
-    <div id="replyModal" class="replyModal" >
+    <!--  Reply Modal -->
+    <div id="replyModal" class="replyModal" style="display:none;">
         <textarea id="replyMessage" placeholder="Type your reply here..." rows="5" style="width:100%;"></textarea>
         <button onclick="sendReply()">Send Reply</button>
         <button onclick="closeReplyModal()">Cancel</button>
     </div>
+
+    <!--  Chat Section (initially hidden) -->
+<div id="chatSection" class="chatSection">
+    <h2 class="chatHeader">Chat</h2>
+    <div class="chatContainer">
+        
+        <!--  Left sidebar: List of unique users who have messaged the company -->
+        <div class="chatSidebar">
+            <h4>Contacts</h4>
+            <ul id="chatUsersList">
+                <li>Loading chat users...</li>
+            </ul>
+        </div>
+
+        <!--  Right side: Conversation and input -->
+        <div class="chatMessages">
+            <h4 id="chatWithHeader">Select a user to view conversation</h4>
+            <div id="conversation" class="conversationWindow">
+                <!-- Chat messages go here -->
+            </div>
+            <div class="messageInput">
+                <textarea id="chatReply" rows="3" placeholder="Type your message here..."></textarea>
+                <button onclick="sendChatMessage()">Send</button>
+            </div>
+        </div>
+
+    </div>
+    <button onclick="closeChatSection()" class="closeChatButton">Close Chat</button>
+</div>
+
 
     <script src="../js/company_home.js"></script>
     <script src="../js/company_logo.js"></script>
