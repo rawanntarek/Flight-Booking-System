@@ -70,11 +70,16 @@ function fetchFlights() {
     .then(data => {
         const flightList = document.getElementById('flight-list');
         flightList.innerHTML = ''; // Clear existing list
+
         if (data.flights && data.flights.length > 0) {
             data.flights.forEach(flight => {
                 const li = document.createElement('li');
+                // Display flight name and ID
                 li.textContent = `${flight.name} (ID: ${flight.flight_id})`;
+
+                // Make <li> clickable
                 li.onclick = () => openFlightDetails(flight.flight_id);
+
                 flightList.appendChild(li);
             });
         } else {
@@ -86,6 +91,13 @@ function fetchFlights() {
         const flightList = document.getElementById('flight-list');
         flightList.innerHTML = '<li>Error fetching flights.</li>';
     });
+}
+
+// This function is called when a user clicks on a flight <li>
+function openFlightDetails(flight_id) {
+    // Redirect to a flight details page, e.g. flight_details.html
+    // Optionally pass flight_id via URL query parameter
+    window.location.href = `flight_details.html?flight_id=${flight_id}`;
 }
 
 // Fetch and display messages from passengers
