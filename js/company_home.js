@@ -89,53 +89,43 @@ function fetchFlights() {
 }
 
 // Fetch and display messages from passengers
-function fetchMessages() {
-    fetch('../php/controllers/get_company_messages.php', {
+// ======================================
+// 1) Fetch only UNREPLIED messages
+function fetchUnrepliedMessages() {
+    fetch('../php/controllers/get_company_unreplied_messages.php', {
         credentials: 'include'
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         const messageList = document.getElementById('message-list');
-        messageList.innerHTML = ''; // Clear existing list
+        messageList.innerHTML = '';
 
         if (data.messages && data.messages.length > 0) {
             data.messages.forEach(msg => {
                 const li = document.createElement('li');
-
-                // Display info about the message
                 li.innerHTML = `
                     <strong>From:</strong> ${msg.passenger_name}<br>
                     <strong>Message:</strong> ${msg.message_content}<br>
                     <strong>Timestamp:</strong> ${msg.timestamp}<br>
-                    <strong>Status:</strong> ${msg.status || 'N/A'}<br>
                 `;
-
-                // Open reply modal on click
+                // On click, open reply modal
                 li.onclick = () => openReplyModal(msg.message_id, msg.passenger_id);
-                
                 messageList.appendChild(li);
             });
         } else {
-            messageList.innerHTML = '<li>No messages received.</li>';
+            messageList.innerHTML = '<li>No unreplied messages.</li>';
         }
     })
     .catch(error => {
-        console.error('Error fetching messages:', error);
-        const messageList = document.getElementById('message-list');
-        messageList.innerHTML = '<li>Error fetching messages.</li>';
+        console.error('Error fetching unreplied messages:', error);
+        document.getElementById('message-list').innerHTML = '<li>Error fetching messages.</li>';
     });
 }
 
-// Open flight details page
-function openFlightDetails(flight_id) {
-    window.location.href = `flight_details.html?flight_id=${flight_id}`;
-}
-
-// Variables to store current message and passenger IDs for reply
+// 2) Handle opening and closing the reply modal
 let currentMessageId = null;
 let currentPassengerId = null;
 
-// Open reply modal
 function openReplyModal(message_id, passenger_id) {
     currentMessageId = message_id;
     currentPassengerId = passenger_id;
@@ -143,22 +133,20 @@ function openReplyModal(message_id, passenger_id) {
     document.getElementById('replyModal').style.display = 'block';
 }
 
-// Close reply modal
 function closeReplyModal() {
     document.getElementById('replyModal').style.display = 'none';
     currentMessageId = null;
     currentPassengerId = null;
 }
 
-// Send reply to passenger
+// 3) Send the reply
 function sendReply() {
     const replyContent = document.getElementById('replyMessage').value.trim();
-    if (replyContent === '') {
+    if (!replyContent) {
         showError('Reply message cannot be empty.');
         return;
     }
 
-    // Prepare form data
     const formData = new FormData();
     formData.append('message_id', currentMessageId);
     formData.append('passenger_id', currentPassengerId);
@@ -168,16 +156,15 @@ function sendReply() {
         method: 'POST',
         body: formData,
         credentials: 'include',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         if (data.success) {
             showFeedback(data.success);
             closeReplyModal();
-            fetchMessages(); // Refresh the messages list
+            // Refresh the unreplied messages list:
+            fetchUnrepliedMessages();
         } else if (data.error) {
             showError(data.error);
         }
@@ -188,13 +175,130 @@ function sendReply() {
     });
 }
 
-// Initialize Company Home Page
+// ======================================
+// 4) Chat Implementation
+
+// Open the chat section
+function openChatSection() {
+    document.getElementById('chatSection').style.display = 'block';
+    fetchChatUsers();
+}
+
+// Close the chat section
+function closeChatSection() {
+    document.getElementById('chatSection').style.display = 'none';
+}
+
+// Fetch all unique users that have ever messaged the company
+function fetchChatUsers() {
+    fetch('../php/controllers/get_company_chat_users.php', { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+        const usersList = document.getElementById('chatUsersList');
+        usersList.innerHTML = '';
+
+        if (data.users && data.users.length > 0) {
+            data.users.forEach(user => {
+                // user.user_id, user.name
+                const li = document.createElement('li');
+                li.style.cursor = 'pointer';
+                li.innerHTML = user.name;
+                li.onclick = () => openConversation(user.user_id, user.name);
+                usersList.appendChild(li);
+            });
+        } else {
+            usersList.innerHTML = '<li>No users found.</li>';
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching chat users:', error);
+        document.getElementById('chatUsersList').innerHTML = '<li>Error fetching users.</li>';
+    });
+}
+
+let currentChatPassengerId = null;
+
+// Open conversation with a specific passenger
+function openConversation(passenger_id, passenger_name) {
+    currentChatPassengerId = passenger_id;
+    document.getElementById('chatWithHeader').textContent = `Chat with ${passenger_name}`;
+    document.getElementById('conversation').innerHTML = 'Loading messages...';
+
+    // Fetch all messages between company and this passenger
+    fetch(`../php/controllers/get_conversation.php?passenger_id=${passenger_id}`, {
+        credentials: 'include'
+    })
+    .then(res => res.json())
+    .then(data => {
+        const convoDiv = document.getElementById('conversation');
+        convoDiv.innerHTML = '';
+
+        if (data.messages && data.messages.length > 0) {
+            data.messages.forEach(msg => {
+                const p = document.createElement('p');
+                // Check who is sender:
+                if (msg.sender_id == passenger_id) {
+                    p.style.textAlign = 'left';
+                    p.innerHTML = `<strong>${msg.sender_name}:</strong> ${msg.message_content}`;
+                } else {
+                    p.style.textAlign = 'right';
+                    p.innerHTML = `<strong>Me:</strong> ${msg.message_content}`;
+                }
+                convoDiv.appendChild(p);
+            });
+            // Scroll to bottom
+            convoDiv.scrollTop = convoDiv.scrollHeight;
+        } else {
+            convoDiv.innerHTML = 'No messages yet.';
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching conversation:', error);
+        document.getElementById('conversation').innerHTML = 'Error loading messages.';
+    });
+}
+
+// Send a new chat message
+function sendChatMessage() {
+    const chatReply = document.getElementById('chatReply');
+    const messageContent = chatReply.value.trim();
+    if (!messageContent) {
+        showError('Message cannot be empty.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('passenger_id', currentChatPassengerId);
+    formData.append('message_content', messageContent);
+
+    fetch('../php/controllers/send_company_chat_message.php', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            chatReply.value = '';
+            // Refresh conversation
+            openConversation(currentChatPassengerId, document.getElementById('chatWithHeader').textContent.replace('Chat with ', ''));
+        } else if (data.error) {
+            showError(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error sending chat message:', error);
+        showError('Error sending chat message.');
+    });
+}
+
+// Initialize
 function initializeCompanyHome() {
     fetchCompanyName();
     fetchCompanyLogo();
     fetchFlights();
-    fetchMessages();
+    fetchUnrepliedMessages(); // <--- changed to fetch only unreplied
 }
 
-// Call initialization on page load
 window.onload = initializeCompanyHome;
