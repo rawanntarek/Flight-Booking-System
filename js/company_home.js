@@ -73,11 +73,22 @@ function fetchMessages() {
     .then(data => {
         const messageList = document.getElementById('message-list');
         messageList.innerHTML = ''; // Clear existing list
+
         if (data.messages && data.messages.length > 0) {
-            data.messages.forEach(message => {
+            data.messages.forEach(msg => {
                 const li = document.createElement('li');
-                li.textContent = `From: ${message.passenger_name} - ${message.message_content}`;
-                li.onclick = () => openReplyModal(message.message_id, message.passenger_id);
+
+                // Display info about the message
+                li.innerHTML = `
+                    <strong>From:</strong> ${msg.passenger_name}<br>
+                    <strong>Message:</strong> ${msg.message_content}<br>
+                    <strong>Timestamp:</strong> ${msg.timestamp}<br>
+                    <strong>Status:</strong> ${msg.status || 'N/A'}<br>
+                `;
+
+                // Open reply modal on click
+                li.onclick = () => openReplyModal(msg.message_id, msg.passenger_id);
+                
                 messageList.appendChild(li);
             });
         } else {
@@ -142,7 +153,7 @@ function sendReply() {
         if (data.success) {
             showFeedback(data.success);
             closeReplyModal();
-            fetchMessages(); // Refresh messages list
+            fetchMessages(); // Refresh the messages list
         } else if (data.error) {
             showError(data.error);
         }

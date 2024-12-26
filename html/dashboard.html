@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="../css/Dashboard.css">
     <link rel="stylesheet" href="../css/company_home.css"> 
     <style>
-      
         /* Dynamically set the logo image using a CSS variable */
         .welcomeback::before {
             content: '';
@@ -42,6 +41,61 @@
             font-weight: bold;
             margin-top: 10px;
         }
+
+        /* Chat popup styling */
+        .chat-popup {
+            display: none; /* Hidden by default, shown when openForm() is called */
+            position: fixed; 
+            bottom: 0;
+            right: 15px;
+            border: 3px solid #f1f1f1;
+            z-index: 9;
+            background-color: #fff;
+            width: 300px;
+            border-radius: 10px;
+        }
+
+        .form-container {
+            padding: 10px;
+        }
+
+        .form-container h1 {
+            margin-top: 0;
+        }
+
+        .form-container label {
+            margin: 5px 0;
+            display: block;
+        }
+
+        .form-container textarea {
+            width: 100%;
+            height: 60px;
+            resize: none;
+        }
+
+        .form-container .btn {
+            background-color: #04AA6D;
+            color: white;
+            padding: 8px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .form-container .cancel {
+            background-color: #cc0000;
+        }
+
+        .form-container .btn:hover {
+            opacity: 0.8;
+        }
+
+        #feedback {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -50,6 +104,8 @@
             <li><a href="../php/controllers/profile.php" class="button">View Profile</a></li>
             <li><a href="../php/controllers/my_bookings.php" class="button">My Bookings</a></li>
             <li><a href="../php/controllers/logout.php" class="button">Logout</a></li>
+            <!-- Add a button/link to open the message (chat) form -->
+            <li><a href="#" class="button" onclick="openForm()">Messages</a></li>
         </ul>
         <br><br>
 
@@ -78,6 +134,31 @@
         <!-- Error Message Container -->
         <div id="error-container" class="error-message"></div>
     </div>
+
+    <!-- 1) The Chat Popup Form (Initially Hidden) -->
+    <div class="chat-popup" id="myForm">
+        <form id="chatForm" class="form-container">
+            <h1>Send a Message</h1>
+            
+            <label for="company">Select Company:</label>
+            <select id="company" name="company">
+                <option value="" disabled selected>Select a company</option>
+                <!-- Options will be populated dynamically via fetchCompanies() -->
+            </select>
+
+            <label for="msg">Message:</label>
+            <textarea id="msg" name="msg" placeholder="Type your message..." required></textarea>
+
+            <button type="submit" class="btn">Send</button>
+            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            
+            <!-- Feedback/Error messages for the chat form will appear here -->
+            <div id="feedback"></div>
+        </form>
+    </div>
+
+    <!-- 2) Your existing scripts -->
+    <script src="../js/dashboard.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {

@@ -14,7 +14,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_type'] !== 'Company') {
 require_once '../config/db_config.php';
 
 // Prepare SQL statement to fetch messages sent by passengers to the company
-$query = "SELECT messages.message_id, passengers.name AS passenger_name, messages.message_content FROM messages JOIN passengers ON messages.sender_id = passengers.passenger_id WHERE messages.receiver_id = ? AND messages.status = 'Unread' ORDER BY messages.timestamp DESC";
+// (Show ALL messages, not just "Unread"; adjust if you only want 'Unread' ones)
+$query = "
+    SELECT
+        m.message_id,
+        m.sender_id AS passenger_id,
+        p.name AS passenger_name,
+        m.message_content,
+        m.timestamp,
+        m.status
+    FROM messages m
+    JOIN passengers p ON m.sender_id = p.passenger_id
+    WHERE m.receiver_id = ?
+    ORDER BY m.timestamp DESC
+";
 
 if ($stmt = $conn->prepare($query)) {
     $company_id = $_SESSION['user_id'];
@@ -35,4 +48,3 @@ if ($stmt = $conn->prepare($query)) {
 }
 
 $conn->close();
-?>
