@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>Company Profile</title>
     <link rel="stylesheet" href="../css/company_profile.css"> 
-
 </head>
 <body>
     <nav>
         <center><a href="#" onclick="go_home()">Home</a></center>
     </nav>
+    
     <div class="container">
         <div id="feedback" class="feedback"></div>
         <div id="error" class="error"></div>
@@ -23,59 +23,64 @@
             <p><strong>Email:</strong> <span id="company-email">Loading...</span></p>
             <p><strong>Account Balance:</strong> $<span id="account-balance">Loading...</span></p>
             <p><strong>Bio:</strong> <span id="company-bio">Loading...</span></p>
-            <p><strong>Address:</strong><span id="company-address">Loading...</span></p>
+            <p><strong>Address:</strong> <span id="company-address">Loading...</span></p>
             <p><strong>All Available Flights</strong></p>
-                <ul id="flight-list" class="flight-list">
-                    <li>Loading flights...</li>
-                </ul>
-            
-       
+            <ul id="flight-list" class="flight-list">
+                <li>Loading flights...</li>
+            </ul>
         </div>
 
-    
+        <!-- CHANGE LOGO SECTION -->
+        <div class="section">
+            <h2>Change Logo</h2>
+            <form id="editLogoForm" enctype="multipart/form-data">
+                <label for="edit-logo">New Logo:</label>
+                <input type="file" id="edit-logo" name="logo" accept="image/*" required>
+                <button type="submit" class="btn">Update Logo</button>
+            </form>
+        </div>
+
+        <!-- CHANGE Name SECTION -->
         <div class="section">
             <h2>Edit Name</h2>
             <form id="editNameForm">
                 <label for="edit-name">New Name:</label>
                 <input type="text" id="edit-name" name="name" required>
-
                 <button type="submit" class="btn">Update Name</button>
             </form>
         </div>
 
+        <!-- CHANGE Email SECTION -->
         <div class="section">
             <h2>Edit Email</h2>
             <form id="editEmailForm">
                 <label for="edit-email">New Email:</label>
                 <input type="email" id="edit-email" name="email" required>
-
                 <button type="submit" class="btn">Update Email</button>
             </form>
         </div>
+
+        <!-- CHANGE Bio SECTION -->
         <div class="section">
             <h2>Edit Bio</h2>
             <form id="editBioForm">
                 <label for="edit-bio">New Bio:</label>
                 <textarea id="edit-bio" name="bio" required></textarea>
-
                 <button type="submit" class="btn">Update Bio</button>
             </form>
         </div>
+        
+        <!-- CHANGE Address SECTION -->
         <div class="section">
             <h2>Edit Address</h2>
             <form id="editAddressForm">
                 <label for="edit-address">New Address:</label>
                 <input id="edit-address" name="address" required>
-
                 <button type="submit" class="btn">Update Address</button>
             </form>
         </div>
-        
-        
     </div>
 
     <script src="../js/company_profile.js"></script>
-
-
 </body>
 </html>
