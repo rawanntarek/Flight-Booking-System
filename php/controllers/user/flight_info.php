@@ -28,7 +28,11 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['flight_id'])) {
     $flight_id = intval($_GET['flight_id']);
 
     // Prepare SQL statement to fetch flight details
-    $flightSql = "SELECT flight_id, name, from_location, to_location, fees, start_time, end_time, completed FROM flights WHERE flight_id = ?";
+// flight_info.php
+...
+$flightSql = "SELECT flight_id, name, from_location, to_location, fees, start_time, end_time, completed, status
+              FROM flights
+              WHERE flight_id = ?";
 
     if ($stmt = $conn->prepare($flightSql)) {
         $stmt->bind_param("i", $flight_id);
@@ -129,10 +133,59 @@ $conn->close();
                                             <td data-label="Attribute"><strong>Status</strong></td>
                                             <td data-label="Details"><?php echo ($flight['completed']) ? 'Completed' : 'Upcoming'; ?></td>
                                         </tr>
+
+                                        <tr>
+                                            <td data-label="Attribute"><strong>Status</strong></td>
+                                            <td data-label="Details">
+                                                <?php 
+                                                if ($flight['status'] === 'Cancelled') {
+                                                    echo 'Cancelled';
+                                                } elseif ($flight['completed']) {
+                                                    echo 'Completed';
+                                                } else {
+                                                    echo 'Active';
+                                                }
+                                                ?>
+                                            </td>
+                                        </tr>
+
+
                                     </tbody>
                                 </table>
                             </div>
 
+                            <!-- Booking Section -->
+                        <!-- Booking Section -->
+<?php if ($flight['status'] === 'Cancelled'): ?>
+    <div class="book-section">
+        <h3>This flight is cancelled</h3>
+        <p>You cannot book a cancelled flight.</p>
+    </div>
+<?php elseif ($flight['completed']): ?>
+    <div class="book-section">
+        <h3>This flight is completed</h3>
+        <p>You cannot book a completed flight.</p>
+    </div>
+<?php else: ?>
+    <!-- Normal booking form here -->
+    <div class="book-section">
+        <h3>Book This Flight</h3>
+        <form method="POST" action="../controllers/user/book_flight.php">
+            <input type="hidden" name="flight_id" value="<?php echo htmlspecialchars($flight['flight_id']); ?>">
+            <?php if ($_SESSION['user_type'] === 'Passenger'): ?>
+                <label for="payment_method">Payment Method:</label>
+                <select name="payment_method" id="payment_method" required>
+                    <option value="" disabled selected>Select Payment Method</option>
+                    <option value="balance">Pay from Account Balance</option>
+                    <option value="cash">Pay Cash</option>
+                </select>
+            <?php elseif ($_SESSION['user_type'] === 'Company'): ?>
+                <!-- etc. -->
+            <?php endif; ?>
+            <input type="submit" value="Book Flight">
+        </form>
+    </div>
+<?php endif; ?>
                             
                         <?php endif; ?>
 

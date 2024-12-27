@@ -38,8 +38,9 @@ $bookingSql = "
         f.fees, 
         f.start_time, 
         f.end_time, 
+        f.status AS flight_status,  -- <---
         f.completed, 
-        fp.status, 
+        fp.status AS booking_status,
         fp.payment_method
     FROM flights f
     JOIN flight_passengers fp ON f.flight_id = fp.flight_id
@@ -103,6 +104,7 @@ $conn->close();
                         <th>Start Time</th>
                         <th>End Time</th>
                         <th>Status</th>
+                        <th>Booking Status</th>
                         <th>Payment Method</th>
                         <th>Action</th>
                     </tr>
@@ -110,29 +112,38 @@ $conn->close();
                 <tbody>
                     <?php foreach ($bookings as $booking): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($booking['flight_id']); ?></td>
-                            <td><?php echo htmlspecialchars($booking['name']); ?></td>
-                            <td><?php echo htmlspecialchars($booking['from_location']); ?></td>
-                            <td><?php echo htmlspecialchars($booking['to_location']); ?></td>
-                            <td><?php echo htmlspecialchars(number_format($booking['fees'], 2)); ?></td>
-                            <td><?php echo htmlspecialchars($booking['start_time']); ?></td>
-                            <td><?php echo htmlspecialchars($booking['end_time']); ?></td>
-                            <td>
-                                <?php 
-                                    if ($booking['status'] === 'Registered') {
-                                        echo '<span class="status-registered">Registered</span>';
-                                    } elseif ($booking['status'] === 'Pending') {
-                                        echo '<span class="status-pending">Pending</span>';
-                                    } else {
-                                        echo htmlspecialchars($booking['status']);
-                                    }
-                                ?>
-                            </td>
-                            <td><?php echo htmlspecialchars(ucfirst($booking['payment_method'])); ?></td>
-                            <td>
-                                <a href="flight_info.php?flight_id=<?php echo urlencode($booking['flight_id']); ?>">View Details</a>
-                            </td>
-                        </tr>
+    <td><?php echo htmlspecialchars($booking['flight_id']); ?></td>
+    <td><?php echo htmlspecialchars($booking['name']); ?></td>
+    <td><?php echo htmlspecialchars($booking['from_location']); ?></td>
+    <td><?php echo htmlspecialchars($booking['to_location']); ?></td>
+    <td><?php echo htmlspecialchars(number_format($booking['fees'], 2)); ?></td>
+    <td><?php echo htmlspecialchars($booking['start_time']); ?></td>
+    <td><?php echo htmlspecialchars($booking['end_time']); ?></td>
+    <td><?php 
+        // The flight's status
+        if ($booking['flight_status'] === 'Cancelled') {
+            echo '<span style="color:red;">Cancelled</span>';
+        } elseif ($booking['completed']) {
+            echo 'Completed';
+        } else {
+            echo 'Active';
+        }
+    ?></td>
+    <td><?php
+        // The user's booking status:
+        if ($booking['booking_status'] === 'Registered') {
+            echo '<span class="status-registered">Registered</span>';
+        } elseif ($booking['booking_status'] === 'Pending') {
+            echo '<span class="status-pending">Pending</span>';
+        } else {
+            echo htmlspecialchars($booking['booking_status']);
+        }
+    ?></td>
+    <td><?php echo htmlspecialchars(ucfirst($booking['payment_method'])); ?></td>
+    <td>
+        <a href="flight_info.php?flight_id=<?php echo urlencode($booking['flight_id']); ?>">View Details</a>
+    </td>
+</tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
