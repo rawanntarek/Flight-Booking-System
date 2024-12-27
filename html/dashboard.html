@@ -42,7 +42,7 @@
             margin-top: 10px;
         }
 
-        /* Chat popup styling */
+        /* Chat popup styling (existing mini form) */
         .chat-popup {
             display: none; /* Hidden by default, shown when openForm() is called */
             position: fixed; 
@@ -96,6 +96,109 @@
         #feedback {
             margin-top: 10px;
         }
+
+        /* =======================================
+           NEW: Full-page Chat Overlay for the user
+           ======================================= */
+        .userChatSection {
+            display: none; /* Hidden by default, toggled by JS */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 800px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            z-index: 9999;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .chatHeader {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .chatContainer {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Left sidebar: contacts list */
+        .chatSidebar {
+            width: 30%;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .chatSidebar h4 {
+            margin-top: 0;
+        }
+
+        .chatSidebar ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .chatSidebar li {
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chatSidebar li:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Right side: conversation & message input */
+        .chatMessages {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .chatMessages h4 {
+            margin-top: 0;
+        }
+
+        /* Conversation window */
+        .conversationWindow {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 5px;
+            margin-bottom: 10px;
+            flex-grow: 1;
+        }
+
+        .conversationWindow p {
+            margin: 5px 0;
+            word-wrap: break-word;
+        }
+
+        /* Input area */
+        .messageInput {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .messageInput textarea {
+            width: 100%;
+            resize: none;
+        }
+
+        .closeChatButton {
+            margin-top: 10px;
+            display: block;
+            margin: 0 auto;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -108,6 +211,13 @@
             <li><a href="#" class="button" onclick="openForm()">Messages</a></li>
         </ul>
         <br><br>
+
+        <nav>
+            <center>
+                <!-- The link to open the new full chat overlay for the user -->
+                <a href="#" onclick="openUserChat()">Chat</a>
+            </center>
+        </nav>
 
         <div class="welcomeback">
             <h2>Welcome Back</h2>
@@ -135,7 +245,7 @@
         <div id="error-container" class="error-message"></div>
     </div>
 
-    <!-- 1) The Chat Popup Form (Initially Hidden) -->
+    <!-- 1) The small Chat Popup Form (Initially Hidden) -->
     <div class="chat-popup" id="myForm">
         <form id="chatForm" class="form-container">
             <h1>Send a Message</h1>
@@ -143,7 +253,7 @@
             <label for="company">Select Company:</label>
             <select id="company" name="company">
                 <option value="" disabled selected>Select a company</option>
-                <!-- Options will be populated dynamically via fetchCompanies() -->
+                <!-- Options will be populated dynamically -->
             </select>
 
             <label for="msg">Message:</label>
@@ -157,12 +267,42 @@
         </form>
     </div>
 
-    <!-- 2) Your existing scripts -->
+    <!-- 2) The new user chat overlay (initially hidden) -->
+    <div id="userChatSection" class="userChatSection">
+        <h2 class="chatHeader">Chat</h2>
+        <div class="chatContainer">
+            
+            <!--  Left sidebar: List of unique companies who have messaged the user -->
+            <div class="chatSidebar">
+                <h4>Contacts</h4>
+                <ul id="userChatCompanyList">
+                    <li>Loading chat companies...</li>
+                </ul>
+            </div>
+
+            <!--  Right side: Conversation and input -->
+            <div class="chatMessages">
+                <h4 id="chatWithHeader">Select a company to view conversation</h4>
+                <div id="conversation" class="conversationWindow">
+                    <!-- Chat messages go here -->
+                </div>
+                <div class="messageInput">
+                    <textarea id="chatReply" rows="3" placeholder="Type your message here..."></textarea>
+                    <button onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+
+        </div>
+        <button onclick="closeUserChat()" class="closeChatButton">Close Chat</button>
+    </div>
+
+
+    <!-- JS: existing scripts plus the new chat logic -->
     <script src="../js/dashboard.js"></script>
 
     <script>
+        // 1) Existing code to fetch user data from dashboard.php
         document.addEventListener("DOMContentLoaded", function() {
-            // Fetch user data from dashboard.php
             fetch('../php/controllers/user/dashboard.php')
                 .then(response => {
                     if (!response.ok) {
@@ -188,9 +328,214 @@
                 .catch(error => {
                     console.error('Fetch error:', error);
                     document.getElementById('company-name').textContent = 'Error loading user data';
-                    document.getElementById('error-container').textContent = 'Unable to load user data. Please try again later.';
+                    document.getElementById('error-container').textContent = 
+                        'Unable to load user data. Please try again later.';
                 });
         });
+
+        // 2) The smaller chat popup (the one opened by openForm())
+        function openForm() {
+            document.getElementById("myForm").style.display = "block";
+            // Optionally fetch the list of available companies to message
+            fetchCompanies();
+        }
+        function closeForm() {
+            document.getElementById("myForm").style.display = "none";
+        }
+        function fetchCompanies() {
+            fetch('../php/controllers/get_companies.php', {
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const companySelect = document.getElementById('company');
+                companySelect.innerHTML = '<option value="" disabled selected>Select a company</option>'; // Reset options
+        
+                if (data.companies && data.companies.length > 0) {
+                    data.companies.forEach(company => {
+                        const option = document.createElement('option');
+                        option.value = company.user_id;
+                        option.textContent = company.name;
+                        companySelect.appendChild(option);
+                    });
+                } else {
+                    companySelect.innerHTML = '<option value="" disabled>No companies available</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching companies:', error);
+                const feedback = document.getElementById('feedback');
+                feedback.textContent = 'Error fetching companies. Please try again later.';
+            });
+        }
+        
+        // Call fetchCompanies on page load
+        document.addEventListener("DOMContentLoaded", fetchCompanies);
+        
+
+        // Sending message from the smaller chat popup
+        document.getElementById('chatForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+        
+            const company = document.getElementById('company').value;
+            const msg = document.getElementById('msg').value.trim();
+        
+            if (!company || !msg) {
+                document.getElementById('feedback').textContent = 'Please select a company and enter a message.';
+                return;
+            }
+        
+            const formData = new FormData();
+            formData.append('company', company);
+            formData.append('msg', msg);
+        
+            fetch('../php/controllers/send_user_message.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const feedback = document.getElementById('feedback');
+                if (data.success) {
+                    feedback.textContent = data.success;
+                    document.getElementById('msg').value = ''; // Clear message input
+                    setTimeout(() => closeForm(), 2000); // Close form after 2 seconds
+                } else if (data.error) {
+                    feedback.textContent = data.error;
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                document.getElementById('feedback').textContent = 'Error sending message. Please try again later.';
+            });
+        });
+
+        
+        // 3) The FULL chat overlay logic
+        let currentChatCompanyId = null;
+        let currentChatCompanyEmail = '';
+
+        // Show chat overlay
+        function openUserChat() {
+            document.getElementById('userChatSection').style.display = 'block';
+            fetchChatCompanies();
+        }
+
+        // Hide chat overlay
+        function closeUserChat() {
+            document.getElementById('userChatSection').style.display = 'none';
+        }
+
+        // Fetch all companies the user has chatted with
+        function fetchChatCompanies() {
+            fetch('../php/controllers/user/get_user_chat_companies.php', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                const companyList = document.getElementById('userChatCompanyList');
+                companyList.innerHTML = '';
+                if (data.companies && data.companies.length > 0) {
+                    data.companies.forEach(company => {
+                        const li = document.createElement('li');
+                        li.style.cursor = 'pointer';
+                        // show the company email or name
+                        li.textContent = company.email || company.name || 'Unknown';
+                        li.onclick = () => openConversation(company.user_id, company.email || company.name);
+                        companyList.appendChild(li);
+                    });
+                } else {
+                    companyList.innerHTML = '<li>No companies found.</li>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching companies:', error);
+                document.getElementById('userChatCompanyList').innerHTML = 
+                    '<li>Error fetching companies.</li>';
+            });
+        }
+
+        // Open conversation with a specific company
+        function openConversation(companyId, companyEmail) {
+            currentChatCompanyId = companyId;
+            currentChatCompanyEmail = companyEmail;
+            document.getElementById('chatWithHeader').textContent = `Chat with ${companyEmail}`;
+            
+            const convoDiv = document.getElementById('conversation');
+            convoDiv.innerHTML = 'Loading messages...';
+
+            // Now fetch conversation from server
+            fetch(`../php/controllers/user/get_user_conversation.php?company_id=${companyId}`, 
+                  { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                convoDiv.innerHTML = '';
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(msg => {
+                        const p = document.createElement('p');
+                        // If msg.sender_id == current user => align right
+                        if (msg.sender_id == data.current_user_id) {
+                            p.style.textAlign = 'right';
+                            p.innerHTML = `<strong>Me:</strong> ${msg.message_content}`;
+                        } else {
+                            p.style.textAlign = 'left';
+                            p.innerHTML = `<strong>${companyEmail}:</strong> ${msg.message_content}`;
+                        }
+                        convoDiv.appendChild(p);
+                    });
+                    // scroll to bottom
+                    convoDiv.scrollTop = convoDiv.scrollHeight;
+                } else {
+                    convoDiv.innerHTML = 'No messages yet.';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching conversation:', error);
+                convoDiv.innerHTML = 'Error loading messages.';
+            });
+        }
+
+        // Send new chat message to currently selected company
+        function sendChatMessage() {
+            const msgContent = document.getElementById('chatReply').value.trim();
+            if (!msgContent) {
+                alert('Message cannot be empty.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('company_id', currentChatCompanyId);
+            formData.append('message_content', msgContent);
+
+            fetch('../php/controllers/user/send_user_chat_message.php', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('chatReply').value = '';
+                    // Refresh conversation
+                    openConversation(currentChatCompanyId, currentChatCompanyEmail);
+                } else if (data.error) {
+                    console.error(data.error);
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending chat message:', error);
+                alert('Error sending message.');
+            });
+        }
     </script>
 </body>
 </html>
