@@ -1,0 +1,76 @@
+body {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    background: #ffffff;
+    margin: 0;
+}
+.container {
+    width: 95%;
+    margin: 20px auto;
+    background: linear-gradient(-45deg, #a1d8e5, #b9dcea, #5bdbff);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.section {
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.icon {
+    width: 60px; 
+    height: 55px; 
+    border-radius: 50%; 
+    vertical-align: middle; 
+    margin-right: 8px; 
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.btn {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(-45deg, #a1d8e5, #b9dcea, #5bdbff);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn:hover {
+    background: linear-gradient(-45deg, #043d4a, #b9dcea, #032c38);
+}
+.feedback {
+    color: green;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
