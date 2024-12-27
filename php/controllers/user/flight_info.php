@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['flight_id'])) {
 
     // Prepare SQL statement to fetch flight details
 // flight_info.php
-...
+
 $flightSql = "SELECT flight_id, name, from_location, to_location, fees, start_time, end_time, completed, status
               FROM flights
               WHERE flight_id = ?";
@@ -154,7 +154,6 @@ $conn->close();
                                 </table>
                             </div>
 
-                            <!-- Booking Section -->
                         <!-- Booking Section -->
 <?php if ($flight['status'] === 'Cancelled'): ?>
     <div class="book-section">
@@ -168,7 +167,7 @@ $conn->close();
     </div>
 <?php else: ?>
     <!-- Normal booking form here -->
-    <div class="book-section">
+    <div class="book-section" style="display:none;">   
         <h3>Book This Flight</h3>
         <form method="POST" action="../controllers/user/book_flight.php">
             <input type="hidden" name="flight_id" value="<?php echo htmlspecialchars($flight['flight_id']); ?>">
