@@ -4,9 +4,28 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <!-- Link to your existing CSS files -->
-    <link rel="stylesheet" href="../css/Dashboard.css">
     <link rel="stylesheet" href="../css/company_home.css"> 
+    <link rel="stylesheet" href="../css/Dashboard.css">
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
     <style>
+
+
+
+        :root {
+            --primary-color: #3d5cb8;
+            --primary-color-dark: #334c99;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
+            --extra-light: #f1f5f9;
+            --white: #ffffff;
+            --max-width: 1200px;
+          }
+
+        
         /* Dynamically set the logo image using a CSS variable */
         .welcomeback::before {
             content: '';
@@ -199,6 +218,160 @@
             margin: 0 auto;
             cursor: pointer;
         }
+
+
+
+/* Container styling similar to .booking__container */
+.search-section {
+    /* Rounded corners, subtle border & box shadow */
+    border-radius: 2rem;
+    border: 1px solid var(--extra-light);
+    box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.1);
+    
+    /* Centered and maximum width constraints */
+    max-width: 600px;
+    margin: 2rem auto;
+    
+    /* Optional background and padding */
+    background-color: var(--white);
+    padding: 2rem;
+  }
+  
+  /* Form layout similar to the grid in .booking__container form */
+  .search-form {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns for 'From' and 'To' */
+    gap: 1rem;
+  }
+  
+  /* Labels similar in style to .booking__container label */
+  .search-form label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Inputs styled similarly to .booking__container input */
+  .search-form input[type="text"] {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    
+    outline: none;
+    border: none;
+    border-bottom: 1px solid var(--primary-color);
+    color: var(--text-dark);
+    
+    transition: border-bottom-color 0.3s;
+  }
+  
+  .search-form input[type="text"]:focus {
+    border-bottom: 2px solid var(--primary-color);
+  }
+  
+  /* Submit button styling similar to .booking__container .btn */
+  .search-form input[type="submit"] {
+    grid-column: span 2; /* Make the button span the full width */
+    padding: 0.75rem;
+    font-size: 1rem;
+    
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 0.5rem;
+    
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .search-form input[type="submit"]:hover {
+    background-color: var(--secondary-color);
+  }
+  
+  /* Optional: Handle the line break <br> in a nicer way */
+  .search-form br {
+    display: none; /* Remove or override the line break if you prefer */
+  }
+  
+  /* ----------- Responsive Adjustments (like your media queries) ----------- */
+  
+  /* For screens narrower than 900px */
+  @media (width < 900px) {
+    .search-form {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* For screens narrower than 600px */
+  @media (width < 600px) {
+    .search-section {
+      padding: 1rem;
+    }
+  }
+  
+
+/* 1) Position the labels and add space for the icon */
+label[for="from"],
+label[for="to"] {
+  position: relative;      /* Allows the pseudo-element to be positioned absolutely */
+  padding-left: 2rem;      /* Space for the icon on the left */
+}
+
+/* 2) Use pseudo-elements to add the location icon next to 'From' and 'To' */
+label[for="from"]::before,
+label[for="to"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* Using Remix Icon’s 'ri-map-pin-line.svg' here. 
+     Make sure you have the correct path to the icon. */
+  background: url("https://cdn.jsdelivr.net/npm/remixicon@2.5.0/icons/Map/map-pin-line.svg") 
+              no-repeat center center;
+  background-size: 1.2rem 1.2rem;
+  
+  width: 1.2rem;   /* Should match background-size */
+  height: 1.2rem; 
+}
+
+
+.header__container .section__header {
+    text-align: center;
+    font-size: 3rem;
+    line-height: 4rem;
+}
+
+/* 1. Make this <ul> behave like .nav__links */
+    ul {
+        list-style: none;          /* Remove default bullets */
+        display: flex;             /* Place items side by side */
+        align-items: center;
+        gap: 2rem;                 /* Spacing between items */
+        
+        /* Optional: match your nav container's width, margins, etc. */
+        max-width: var(--max-width);
+        margin: 1rem auto;
+        padding: 1rem;
+        justify-content: center;   /* Center the list horizontally */
+      }
+      
+      /* 2. Style the links as done with .link a */
+      ul li a.button {
+        font-weight: 500;
+        transition: 0.3s;
+        text-decoration: none;     /* Remove default underline */
+      }
+      
+      ul li a.button:hover {
+        background-color: #a1d8e5;
+        border-radius: 50px;
+      }
+      
+
     </style>
 </head>
 <body>
@@ -207,27 +380,25 @@
             <li><a href="../php/controllers/profile.php" class="button">View Profile</a></li>
             <li><a href="../php/controllers/user/my_bookings.php" class="button">My Bookings</a></li>
             <li><a href="../php/controllers/logout.php" class="button">Logout</a></li>
-            <!-- Add a button/link to open the message (chat) form -->
+            <!-- link to open the message (chat) form -->
             <li><a href="#" class="button" onclick="openForm()">Messages</a></li>
+            <li>  <a href="#" class="button" onclick="openUserChat()">Chat</a></li>
+
         </ul>
         <br><br>
 
-        <nav>
-            <center>
-                <!-- The link to open the new full chat overlay for the user -->
-                <a href="#" onclick="openUserChat()">Chat</a>
-            </center>
-        </nav>
+       
 
         <div class="welcomeback">
             <h2>Welcome Back</h2>
             <p id="company-name">Loading...</p>
         </div>
 
-        <div class="tagline">
-            <p>Explore the skies with ease</p>
-            <p>Book your next adventure today!</p>
-        </div>
+        <header class="section__container header__container">
+            <h1 class="section__header">Find And Book<br />A Great Experience</h1>
+          </header>
+
+     
            
         <div class="search-section">
             <form method="GET" action="../php/controllers/search_flight.php" class="search-form">
